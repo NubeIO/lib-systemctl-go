@@ -9,6 +9,18 @@ import (
 	"time"
 )
 
+// RestartFailed to remove the failed status. To reset all units with failed status:
+func RestartFailed(opts Options) error {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+	defer cancel()
+	var args = []string{"reset-failed", "--system"}
+	if opts.UserMode {
+		args[1] = "--user"
+	}
+	_, _, _, err := execute(ctx, args)
+	return err
+}
+
 // DaemonReload Reload systemd manager configuration.
 //
 // This will rerun all generators (see systemd. generator(7)), reload all unit

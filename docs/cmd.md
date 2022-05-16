@@ -2,6 +2,8 @@
 
 ## builder
 
+The builder will generate a systemd service file
+
 ```
 go build ctl.go &&  ./ctl  builder --write=true --builder-path=/home/aidan --builder-name=test
 ```
@@ -29,6 +31,11 @@ build and add new file here: /home/aidan/test.service
 ```
 
 ## service manager (systemd)
+
+Will let you manage systemctl services (on linux)
+
+- add and remove a new service
+- start/stop/enable a new service
 
 ### add a new service
 

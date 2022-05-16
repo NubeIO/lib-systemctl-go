@@ -3,6 +3,7 @@ package ctl
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeIO/lib-systemctl-go/systemctl"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"path"
@@ -11,18 +12,35 @@ import (
 
 type RemoveOpts struct {
 	ServiceName string
+	FullRemove  bool
 	Stop        bool
 	Disable     bool
 	TestMode    bool
+	Options     systemctl.Options
 }
 
 func Remove(service RemoveOpts) error {
-	if service.Stop || !service.Stop {
-		fmt.Println("TODO add in Stop service")
+	if service.Stop || service.FullRemove {
+		err := systemctl.Stop(service.ServiceName, service.Options)
+		if err != nil {
+			return err
+		}
 	}
-
-	if service.Disable || !service.Disable {
-		fmt.Println("TODO add in Disable service")
+	if service.Disable || service.FullRemove {
+		err := systemctl.Disable(service.ServiceName, service.Options)
+		if err != nil {
+			return err
+		}
+	}
+	if service.FullRemove {
+		err := systemctl.DaemonReload(service.Options)
+		if err != nil {
+			return err
+		}
+		err = systemctl.RestartFailed(service.Options)
+		if err != nil {
+			return err
+		}
 	}
 
 	err := C.removeLib(service)
