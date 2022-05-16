@@ -37,6 +37,14 @@ Will let you manage systemctl services (on linux)
 - add and remove a new service
 - start/stop/enable a new service
 
+### install a new service
+
+Does a full install, this will `add` `enable` and `start` the new service
+
+```
+go build ctl.go  && sudo ./ctl service  --install=true --path=/home/aidan/test.service  --service=test
+```
+
 ### add a new service
 
 steps
