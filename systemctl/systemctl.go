@@ -237,6 +237,9 @@ func Status(unit string, opts Options) (string, error) {
 		args[1] = "--user"
 	}
 	stdout, _, _, err := execute(ctx, args)
+	if stdout == "" {
+		stdout = "service:" + unit + " not found"
+	}
 	return stdout, err
 }
 
