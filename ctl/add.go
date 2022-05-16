@@ -2,17 +2,44 @@ package ctl
 
 import (
 	"fmt"
+	"github.com/NubeIO/lib-systemctl-go/systemctl"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
 )
 
-//Add a new service
-func Add(service string) {
-	if err := C.add(service); err != nil {
-		fmt.Printf("Failed to add %s: %s \n ", service, err.Error())
+type InstallOpts struct {
+	Service string
+	Path    string
+	Options systemctl.Options
+}
+
+//Install a new service
+func Install(service InstallOpts) error {
+	if err := C.add(service.Path); err != nil {
+		fmt.Printf("Failed to add %s: %s \n ", service.Path, err.Error())
+		return err
 	}
+	//enable
+	err := systemctl.Enable(service.Service, service.Options)
+	if err != nil {
+		return err
+	}
+	//start
+	err = systemctl.Start(service.Service, service.Options)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//Add a new service
+func Add(path string) error {
+	if err := C.add(path); err != nil {
+		return err
+	}
+	return nil
 }
 
 //Add  service hosting

@@ -49,6 +49,12 @@ steps
 go build ctl.go  && sudo ./ctl service  --add=true --path=/home/aidan/test.service
 ```
 
+or do a full install, this will `add` `enable` and `start` the new service
+
+```
+go build ctl.go  && sudo ./ctl service  --install=true --path=/home/aidan/test.service  --service=test
+```
+
 #### remove a service
 
 ```

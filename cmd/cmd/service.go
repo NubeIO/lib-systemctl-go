@@ -8,17 +8,18 @@ import (
 )
 
 var (
-	isActive   bool
-	status     bool
-	start      bool
-	restart    bool
-	stop       bool
-	enable     bool
-	disable    bool
-	add        bool
-	remove     bool
-	fullRemove bool //stop, disable and remove the file
-	path       string
+	isActive    bool
+	status      bool
+	start       bool
+	restart     bool
+	stop        bool
+	enable      bool
+	disable     bool
+	add         bool
+	remove      bool
+	fullRemove  bool //stop, disable and remove the file
+	fullInstall bool //add the new file start, enable
+	path        string
 )
 
 var serviceCmd = &cobra.Command{
@@ -72,7 +73,22 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if add {
-		ctl.Add(path)
+		err := ctl.Add(path)
+		if err != nil {
+			fmt.Println("full Add error", err)
+		}
+	}
+
+	if fullInstall {
+		installOpts := ctl.InstallOpts{
+			Path:    path,
+			Service: serviceName,
+			Options: opts,
+		}
+		err := ctl.Install(installOpts)
+		if err != nil {
+			fmt.Println("full install error", err)
+		}
 	}
 
 	if remove {
@@ -98,7 +114,9 @@ func init() {
 	serviceCmd.Flags().BoolVarP(&enable, "enable", "", false, "enable a service")
 	serviceCmd.Flags().BoolVarP(&disable, "disable", "", false, "disable a service")
 
-	serviceCmd.Flags().BoolVarP(&add, "add", "", false, "add a new service")
+	serviceCmd.Flags().BoolVarP(&add, "add", "", false, "add a new service file")
+	serviceCmd.Flags().BoolVarP(&fullInstall, "install", "", false, "add a new service file and do the full install")
+
 	serviceCmd.Flags().StringVarP(&path, "path", "", "", "provide the path of the new service file eg: /tmp/rubix-updater.service")
 
 	serviceCmd.Flags().BoolVarP(&remove, "remove", "", false, "remove a new service")
