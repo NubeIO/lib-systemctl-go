@@ -7,17 +7,6 @@ import (
 )
 
 var (
-	//isActive   bool
-	//status     bool
-	//start      bool
-	//stop       bool
-	//enable     bool
-	//disable    bool
-	//add        bool
-	//remove     bool
-	//fullRemove bool //stop, disable and remove the file
-	//path       string
-
 	builderPath        string
 	builderServiceName string
 	builderWrite       bool

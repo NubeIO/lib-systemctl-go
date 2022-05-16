@@ -6,12 +6,11 @@
 *.dylib
 .idea
 .code
-
+./cmd/ctl
 
 # Test binary, built with `go test -c`
 *.test
 *.ctl
-*.main
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
