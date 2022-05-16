@@ -16,6 +16,6 @@ func TestSystemDBuilder(*testing.T) {
 		ExecCmd:   execCmd,
 	}
 
-	bld.build()
+	bld.Build()
 
 }

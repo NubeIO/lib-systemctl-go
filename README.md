@@ -7,7 +7,6 @@ clone the repo
 ```
 go mod tidy
 cd cmd
-
 ```
 
 run as sudo
@@ -20,4 +19,4 @@ go build ctl.go && sudo ./ctl  --help
 
 [CLI](docs/cmd.md)
 
-[tests](docs/tests.md)
+[TESTS](docs/tests.md)

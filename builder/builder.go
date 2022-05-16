@@ -2,7 +2,6 @@ package builder
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 )
 
@@ -22,12 +21,16 @@ type WriteFile struct {
 
 func (inst *SystemDBuilder) Build() error {
 	serviceFile := fmt.Sprintf(inst.template(), inst.Name, inst.User, inst.Directory, inst.ExecCmd)
-	log.Println(serviceFile)
+	fmt.Println("------------------------------")
+	fmt.Println(serviceFile)
+	fmt.Println("------------------------------")
 	if inst.WriteFile.Write {
 		path := inst.WriteFile.Path
 		name := inst.WriteFile.FileName
 		servicePath := fmt.Sprintf("%s/%v.service", path, name)
-		log.Println("build and add new file here:", servicePath)
+		fmt.Println("------------------------------")
+		fmt.Println("build and add new file here:", servicePath)
+		fmt.Println("------------------------------")
 		err := ioutil.WriteFile(servicePath, []byte(serviceFile), 0644)
 		if err != nil {
 			return err
