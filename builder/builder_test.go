@@ -5,15 +5,16 @@ import (
 )
 
 func TestSystemDBuilder(*testing.T) {
-	name := "aidans-service"
-	user := "aidan"
-	directory := "/home/aidan"
-	execCmd := "/usr/bin/python3 something.py"
+	description := "BIOS comes with default OS, non-upgradable"
+	user := "root"
+	directory := "/data/tmp/rubix-bios"
+	execCmd := "./data/rubix-bios -p 1615 -g /data/rubix-bios -d data -c config -a apps --prod --auth  --device-type amd64 --token 1234"
 	bld := &SystemDBuilder{
-		Name:      name,
-		User:      user,
-		Directory: directory,
-		ExecCmd:   execCmd,
+		Description:      description,
+		User:             user,
+		WorkingDirectory: directory,
+		ExecStart:        execCmd,
+		SyslogIdentifier: "rubix-bios",
 	}
 
 	bld.Build()

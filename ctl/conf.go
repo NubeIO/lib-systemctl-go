@@ -10,7 +10,6 @@ import (
 	"sync"
 )
 
-//var C = newConf()
 var C *conf
 
 type conf struct {
@@ -25,9 +24,7 @@ type Options struct {
 }
 
 func New(opts *Options) {
-
 	C = newConf()
-
 }
 
 // read from local home directory
