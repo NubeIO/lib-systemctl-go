@@ -74,7 +74,7 @@ type SystemDBuilder struct {
 type WriteFile struct {
 	Write    bool
 	Path     string
-	FileName string
+	FileName string //nubeio-rubix-bios NOT nubeio-rubix-bios.service
 }
 
 func (inst *SystemDBuilder) Build() error {

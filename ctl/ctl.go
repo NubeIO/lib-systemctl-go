@@ -10,21 +10,22 @@ import (
 	"sync"
 )
 
-var C *conf
-
 type conf struct {
-	services   []*service // list of managed services
-	controlDir string
-	workDir    string
-	locker     *sync.Mutex
+	service     string
+	path        string
+	services    []*service // list of managed services
+	controlDir  string
+	workDir     string
+	locker      *sync.Mutex
+	InstallOpts InstallOpts
+	RemoveOpts  RemoveOpts
 }
 
-type Options struct {
-	WorkDir string
-}
-
-func New(opts *Options) {
-	C = newConf()
+func New(service, path string) *conf {
+	c := newConf()
+	c.service = service
+	c.path = path
+	return c
 }
 
 // read from local home directory
@@ -62,9 +63,9 @@ func newConf() *conf {
 }
 
 //Has Whether the service is already managed
-func (c *conf) Has(name string) *service {
+func (inst *conf) Has(name string) *service {
 	name = strings.TrimSuffix(name, ".service")
-	for _, existed := range c.services {
+	for _, existed := range inst.services {
 		if name == existed.Name {
 			return existed
 		}
@@ -73,16 +74,16 @@ func (c *conf) Has(name string) *service {
 }
 
 //List  of managed services
-func (c *conf) List() []*service {
-	return c.services
+func (inst *conf) List() []*service {
+	return inst.services
 }
 
 // WorkDir get
-func (c *conf) WorkDir() string {
-	return c.workDir
+func (inst *conf) WorkDir() string {
+	return inst.workDir
 }
 
 // ControlDir get
-func (c *conf) ControlDir() string {
-	return c.controlDir
+func (inst *conf) ControlDir() string {
+	return inst.controlDir
 }

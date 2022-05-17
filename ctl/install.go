@@ -3,6 +3,7 @@ package ctl
 import (
 	"fmt"
 	"github.com/NubeIO/lib-systemctl-go/systemctl"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path"
@@ -10,42 +11,51 @@ import (
 )
 
 type InstallOpts struct {
-	Service string
-	Path    string
 	Options systemctl.Options
 }
 
 //Install a new service
-func Install(service InstallOpts) error {
-	if err := C.add(service.Path); err != nil {
-		fmt.Printf("Failed to add %s: %s \n ", service.Path, err.Error())
+func (inst *conf) Install() error {
+	if err := inst.add(inst.path); err != nil {
+		log.Errorf("failed to add %s: %s \n ", inst.path, err.Error())
+		return err
+	}
+	log.Infof("added new file %s: \n ", inst.path)
+	//reload
+	err := systemctl.DaemonReload(inst.InstallOpts.Options)
+	if err != nil {
+		log.Errorf("failed to DaemonReload%s: err:%s \n ", inst.service, err.Error())
 		return err
 	}
 	//enable
-	err := systemctl.Enable(service.Service, service.Options)
+	err = systemctl.Enable(inst.service, inst.InstallOpts.Options)
 	if err != nil {
+		log.Errorf("failed to enable%s: err:%s \n ", inst.service, err.Error())
 		return err
 	}
+	log.Infof("enable new service:%s \n ", inst.service)
 	//start
-	err = systemctl.Start(service.Service, service.Options)
+	err = systemctl.Restart(inst.service, inst.InstallOpts.Options)
 	if err != nil {
+		log.Errorf("failed to start%s: err:%s \n ", inst.service, err.Error())
 		return err
 	}
+	log.Infof("start new service:%s \n ", inst.service)
 	return nil
 }
 
 //Add a new service
-func Add(path string) error {
-	if err := C.add(path); err != nil {
+func (inst *conf) Add(path string) error {
+	if err := inst.add(path); err != nil {
 		return err
 	}
 	return nil
 }
 
 //Add  service hosting
-func (c *conf) add(file string) error {
-	c.locker.Lock()
-	defer c.locker.Unlock()
+func (inst *conf) add(file string) error {
+	inst.locker.Lock()
+	defer inst.locker.Unlock()
 	if filepath.Ext(file) != ".service" {
 		return fmt.Errorf(" must add a valid service file")
 	}
@@ -56,15 +66,20 @@ func (c *conf) add(file string) error {
 	if stat.IsDir() {
 		return fmt.Errorf("must add a valid service file")
 	}
-	if c.Has(stat.Name()) != nil {
-		return fmt.Errorf("%s already exists", stat.Name())
+
+	replaceFile := false
+	if replaceFile { //TODO maybe give the user this option
+		if inst.Has(stat.Name()) != nil {
+			return fmt.Errorf("%s already exists", stat.Name())
+		}
+
 	}
-	expected := path.Join(c.workDir, stat.Name())
+	expected := path.Join(inst.workDir, stat.Name())
 	err = copyFile(file, expected)
 	if err != nil {
 		return err
 	}
-	c.services = append(c.services, newService(stat.Name(), expected))
+	inst.services = append(inst.services, newService(stat.Name(), expected))
 	return nil
 }
 

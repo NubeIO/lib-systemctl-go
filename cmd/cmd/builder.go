@@ -33,11 +33,12 @@ func runBuilder(cmd *cobra.Command, args []string) {
 	}
 
 	bld := &builder.SystemDBuilder{
-		Name:      name,
-		User:      user,
-		Directory: directory,
-		ExecCmd:   execCmd,
-		WriteFile: write,
+		Description:      name,
+		User:             user,
+		WorkingDirectory: directory,
+		ExecStart:        execCmd,
+		SyslogIdentifier: "rubix-bios",
+		WriteFile:        write,
 	}
 
 	err := bld.Build()

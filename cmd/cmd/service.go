@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/NubeIO/lib-systemctl-go/ctl"
+
 	"github.com/NubeIO/lib-systemctl-go/systemctl"
 	"github.com/spf13/cobra"
 )
@@ -33,8 +34,15 @@ func run(cmd *cobra.Command, args []string) {
 
 	timeOut := 5
 
-	ctl.New(&ctl.Options{WorkDir: ""})
+	service := ctl.New(serviceName, path)
 	opts := systemctl.Options{Timeout: timeOut}
+	installOpts := ctl.InstallOpts{
+		Options: opts,
+	}
+	removeOpts := ctl.RemoveOpts{RemoveOpts: opts}
+	service.InstallOpts = installOpts
+	service.RemoveOpts = removeOpts
+
 	if isActive {
 		out, msg, err := systemctl.IsActive(serviceName, opts)
 		fmt.Println(out, msg)
@@ -73,19 +81,14 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if add {
-		err := ctl.Add(path)
+		err := service.Add(path)
 		if err != nil {
 			fmt.Println("full Add error", err)
 		}
 	}
 
 	if fullInstall {
-		installOpts := ctl.InstallOpts{
-			Path:    path,
-			Service: serviceName,
-			Options: opts,
-		}
-		err := ctl.Install(installOpts)
+		err := service.Install()
 		if err != nil {
 			fmt.Println("full install error", err)
 		}
@@ -93,12 +96,12 @@ func run(cmd *cobra.Command, args []string) {
 
 	if remove {
 		fmt.Println("try and remove a file:", serviceName)
-		err := ctl.Remove(ctl.RemoveOpts{ServiceName: serviceName, Options: opts})
+		err := service.Remove()
 		fmt.Println(err)
 	}
 	if fullRemove {
 		fmt.Println("try and remove a file:", serviceName)
-		err := ctl.Remove(ctl.RemoveOpts{ServiceName: serviceName, Options: opts, FullRemove: true})
+		err := service.Remove()
 		fmt.Println(err)
 	}
 
