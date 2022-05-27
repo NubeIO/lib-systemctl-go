@@ -14,31 +14,43 @@ type InstallOpts struct {
 	Options systemctl.Options
 }
 
+type InstallResp struct {
+	Install      string
+	DaemonReload string
+	Enable       string
+	Restart      string
+}
+
 //Install a new service
-func (inst *conf) Install() error {
+func (inst *conf) Install() *InstallResp {
+	resp := &InstallResp{}
 	if err := inst.add(inst.path); err != nil {
 		log.Errorf("failed to add %s: %s \n ", inst.path, err.Error())
-		return err
+		resp.Install = err.Error()
+		return resp
 	}
 	log.Infof("added new file %s: \n ", inst.path)
 	//reload
 	err := systemctl.DaemonReload(inst.InstallOpts.Options)
 	if err != nil {
 		log.Errorf("failed to DaemonReload%s: err:%s \n ", inst.service, err.Error())
-		return err
+		resp.DaemonReload = err.Error()
+		return resp
 	}
 	//enable
 	err = systemctl.Enable(inst.service, inst.InstallOpts.Options)
 	if err != nil {
 		log.Errorf("failed to enable%s: err:%s \n ", inst.service, err.Error())
-		return err
+		resp.Enable = err.Error()
+		return resp
 	}
 	log.Infof("enable new service:%s \n ", inst.service)
 	//start
 	err = systemctl.Restart(inst.service, inst.InstallOpts.Options)
 	if err != nil {
 		log.Errorf("failed to start%s: err:%s \n ", inst.service, err.Error())
-		return err
+		resp.Restart = err.Error()
+		return resp
 	}
 	log.Infof("start new service:%s \n ", inst.service)
 	return nil
@@ -77,6 +89,7 @@ func (inst *conf) add(file string) error {
 	expected := path.Join(inst.workDir, stat.Name())
 	err = copyFile(file, expected)
 	if err != nil {
+		fmt.Println("copyfile", err)
 		return err
 	}
 	inst.services = append(inst.services, newService(stat.Name(), expected))
@@ -88,6 +101,7 @@ func copyFile(src, dst string) error {
 	var buf = make([]byte, 5*2^20)
 	stat, err := os.Stat(src)
 	if err != nil {
+		fmt.Println("STAT err")
 		return err
 	}
 	if !stat.Mode().IsRegular() {
@@ -95,6 +109,7 @@ func copyFile(src, dst string) error {
 	}
 	source, err := os.Open(src)
 	if err != nil {
+		fmt.Println("OPne err")
 		return err
 	}
 	defer func(source *os.File) {
@@ -102,6 +117,7 @@ func copyFile(src, dst string) error {
 	}(source)
 	destination, err := os.Create(dst)
 	if err != nil {
+		fmt.Println("Create err")
 		return err
 	}
 	defer func(destination *os.File) {
@@ -110,6 +126,7 @@ func copyFile(src, dst string) error {
 	for {
 		Byte, err := source.Read(buf)
 		if err != nil && err != io.EOF {
+			fmt.Println("read err")
 			return err
 		}
 		if Byte == 0 {
@@ -117,6 +134,7 @@ func copyFile(src, dst string) error {
 		}
 		_, err = destination.Write(buf[:Byte])
 		if err != nil {
+			fmt.Println("write err")
 			return err
 		}
 	}

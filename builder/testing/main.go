@@ -14,8 +14,8 @@ func main() {
 	newService := "nubeio-rubix-bios"
 	description := "BIOS comes with default OS, non-upgradable"
 	user := "root"
-	directory := "/data/rubix-bios-app/v1.5.2"
-	execCmd := "/data/rubix-bios-app/v1.5.2/rubix-bios -p 1615 -g /data/rubix-bios -d data -c config -a apps --prod --auth  --device-type amd64 --token 1234"
+	directory := "/data/rubix-bios-app"
+	execCmd := "/data/rubix-bios-app/rubix-bios -p 1615 -g /data/rubix-bios -d data -c config -a apps --prod --auth  --device-type amd64 --token 1234"
 	bld := &builder.SystemDBuilder{
 		Description:      description,
 		User:             user,

@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -22,7 +23,11 @@ func TestSystemDBuilder(*testing.T) {
 		},
 	}
 
-	bld.Build()
+	err := bld.Build()
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
 
 }
 

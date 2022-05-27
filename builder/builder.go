@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -50,31 +51,32 @@ WantedBy=%v`
 }
 
 type SystemDBuilder struct {
+	ServiceName string `json:"service_name"` //nubeio-rubix-bios
 
 	//[Unit]
-	Description string
-	After       string //network.target
+	Description string `json:"description"`
+	After       string `json:"after"` //network.target
 	//[Service]
-	Type             string //simple
-	User             string
-	WorkingDirectory string
-	ExecStart        string
-	Restart          string
-	RestartSec       int
-	StandardOutput   string
-	StandardError    string
-	SyslogIdentifier string
+	Type             string `json:"type"` //simple
+	User             string `json:"user"`
+	WorkingDirectory string `json:"working_directory"`
+	ExecStart        string `json:"exec_start"`
+	Restart          string `json:"restart"`
+	RestartSec       int    `json:"restart_sec"`
+	StandardOutput   string `json:"standard_output"`
+	StandardError    string `json:"standard_error"`
+	SyslogIdentifier string `json:"syslog_identifier"`
 	//[Install]
-	WantedBy string //multi-user.target
+	WantedBy string `json:"wanted_by"` //multi-user.target
 
 	// write the file to a location
-	WriteFile WriteFile
+	WriteFile WriteFile `json:"write_file"`
 }
 
 type WriteFile struct {
-	Write    bool
-	Path     string
-	FileName string //nubeio-rubix-bios NOT nubeio-rubix-bios.service
+	Write    bool   `json:"write"`
+	Path     string `json:"path"`
+	FileName string `json:"file_name"` //nubeio-rubix-bios NOT nubeio-rubix-bios.service
 }
 
 func (inst *SystemDBuilder) Build() error {
@@ -133,8 +135,9 @@ func (inst *SystemDBuilder) Build() error {
 		fmt.Println("------------------------------")
 		fmt.Println("build and add new file here:", servicePath)
 		fmt.Println("------------------------------")
-		err := ioutil.WriteFile(servicePath, []byte(serviceFile), 0644)
+		err := ioutil.WriteFile(servicePath, []byte(serviceFile), os.ModePerm)
 		if err != nil {
+			fmt.Println("write file error", err)
 			return err
 		}
 	}
