@@ -35,17 +35,17 @@ const (
 	Dead = SubState("dead")
 )
 
-type SystemStats struct {
-	State                  UnitFileState //enabled, disabled
-	ActiveState            ActiveState   // active, inactive
-	SubState               SubState      //running, //dead
-	ActiveEnterTimestamp   string
-	InactiveEnterTimestamp string
-	Restarts               string //NRestarts number of restart
+type SystemState struct {
+	State                  UnitFileState `json:"state"`        //enabled, disabled
+	ActiveState            ActiveState   `json:"active_state"` // active, inactive
+	SubState               SubState      `json:"sub_state"`    //running, //dead
+	ActiveEnterTimestamp   string        `json:"active_enter_timestamp"`
+	InactiveEnterTimestamp string        `json:"inactive_enter_timestamp"`
+	Restarts               string        `json:"restarts"` //NRestarts number of restart
 }
 
-// Stats get status
-func Stats(unit string, opts Options) (SystemStats, error) {
+// State get status
+func State(unit string, opts Options) (SystemState, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"show", unit, "--no-page"}
@@ -53,7 +53,7 @@ func Stats(unit string, opts Options) (SystemStats, error) {
 		args[1] = "--user"
 	}
 	stdout, _, _, err := execute(ctx, args)
-	stats := SystemStats{}
+	stats := SystemState{}
 
 	unitState := UnitFileState("")
 	activeState := ActiveState("")

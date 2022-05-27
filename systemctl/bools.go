@@ -85,6 +85,18 @@ func IsActive(unit string, opts Options) (active bool, status string, err error)
 	}
 }
 
+// IsRunning Check whether specified units is in a "running" state.
+func IsRunning(unit string, opts Options) (active bool, status string, err error) {
+	stats, err := State(unit, opts)
+	if err != nil {
+		return false, string(stats.SubState), err
+	}
+	if stats.SubState != "running" {
+		return false, string(stats.SubState), nil
+	}
+	return true, string(stats.SubState), nil
+}
+
 // IsFailed Check whether any of the specified units are in a "failed" state.
 func IsFailed(unit string, opts Options) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
