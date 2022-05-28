@@ -83,7 +83,7 @@ type WriteFile struct {
 
 func (inst *SystemDBuilder) Build() error {
 	if inst.ServiceName == "" {
-		return errors.New("please provide a ServiceName")
+		return errors.New("systemctl service builder please provide a ServiceName")
 	}
 	if inst.Description == "" {
 		inst.Description = fmt.Sprintf("nube-io app %s", inst.ServiceName)
