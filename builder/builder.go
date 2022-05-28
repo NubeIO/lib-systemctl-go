@@ -35,6 +35,7 @@ func (inst *SystemDBuilder) template() string {
 Description=%v
 After=%v
 [Service]
+ExecStartPre=%v
 Type=%v
 User=%v
 WorkingDirectory=%v
@@ -57,7 +58,8 @@ type SystemDBuilder struct {
 	Description string `json:"description"`
 	After       string `json:"after"` //network.target
 	//[Service]
-	Type             string `json:"type"` //simple
+	ExecStartPre     string `json:"exec_start_pre"` //ExecStartPre=/bin/sleep 0
+	Type             string `json:"type"`           //simple
 	User             string `json:"user"`
 	WorkingDirectory string `json:"working_directory"`
 	ExecStart        string `json:"exec_start"`
@@ -80,14 +82,20 @@ type WriteFile struct {
 }
 
 func (inst *SystemDBuilder) Build() error {
+	if inst.ServiceName == "" {
+		return errors.New("please provide a ServiceName")
+	}
 	if inst.Description == "" {
-		return errors.New("please provide a description")
+		inst.Description = fmt.Sprintf("nube-io app %s", inst.ServiceName)
 	}
 	if inst.After == "" {
 		inst.After = "network.target"
 	}
 	if inst.User == "" {
 		inst.User = "root"
+	}
+	if inst.ExecStartPre == "" {
+		inst.ExecStartPre = "/bin/sleep 0"
 	}
 	if inst.Type == "" {
 		inst.Type = "simple"
@@ -105,7 +113,7 @@ func (inst *SystemDBuilder) Build() error {
 		inst.StandardError = "syslog"
 	}
 	if inst.SyslogIdentifier == "" {
-		inst.SyslogIdentifier = strings.ToLower(inst.Description)
+		inst.SyslogIdentifier = strings.ToLower(inst.ServiceName)
 	}
 	if inst.WantedBy == "" {
 		inst.WantedBy = "multi-user.target"
@@ -114,6 +122,7 @@ func (inst *SystemDBuilder) Build() error {
 	serviceFile := fmt.Sprintf(inst.template(),
 		inst.Description,
 		inst.After,
+		inst.ExecStartPre,
 		inst.Type,
 		inst.User,
 		inst.WorkingDirectory,
