@@ -2,6 +2,7 @@ package builder
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -24,11 +25,22 @@ func TestSystemDBuilder(*testing.T) {
 		},
 	}
 
-	err := bld.Build()
+	err := bld.Build(0700)
 	fmt.Println(err)
 	if err != nil {
 		return
 	}
+
+	fmt.Println(strings.Contains("/home/aidan/aidan-test/aidan_test//", "//"))
+
+	//base := "/home"
+	//path := "aa"
+	//rel, err := filepath.Rel(base, path)
+	//fmt.Printf("Base %q: Path %q: Rel %q Err %v\n", base, path, rel, err)
+	//if err != nil {
+	//	fmt.Println("PROCEED")
+	//	return
+	//}
 
 }
 

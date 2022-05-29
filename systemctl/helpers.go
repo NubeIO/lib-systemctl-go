@@ -55,7 +55,7 @@ func GetPID(unit string, opts Options) (int, error) {
 //setTimeout limit with the timeout can be
 func setTimeout(timeOut int) time.Duration {
 	if timeOut <= 0 || timeOut >= 120 {
-		timeOut = 120
+		timeOut = 10
 	}
 	return time.Duration(timeOut)
 }

@@ -31,7 +31,7 @@ func New(service, path string) *conf {
 // read from local home directory
 func newConf() *conf {
 	dir := "/lib/systemd/system"
-	c := conf{workDir: dir, controlDir: dir, locker: new(sync.Mutex)}
+	c := &conf{workDir: dir, controlDir: dir, locker: new(sync.Mutex)}
 
 	stat, err := os.Stat(dir)
 	if err != nil {
@@ -40,26 +40,28 @@ func newConf() *conf {
 			//	fmt.Println(" Failed to initialize configuration:", err.Error())
 			//	os.Exit(1)
 			//}
-			return &c
+			return c
 		}
 		fmt.Printf(" Failed to load local configuration: %s\n", err.Error())
-		os.Exit(1)
+		return c
+
 	}
 	if !stat.IsDir() {
 		fmt.Println(" Configuration file is invalid ")
-		os.Exit(1)
+		return c
+
 	}
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		fmt.Printf(" Failed to load local configuration: %s\n ", err.Error())
-		os.Exit(1)
+		return c
 	}
 	for _, file := range files {
 		if !file.IsDir() && filepath.Ext(file.Name()) == ".service" {
 			c.services = append(c.services, newService(file.Name(), path.Join(dir, file.Name())))
 		}
 	}
-	return &c
+	return c
 }
 
 //Has Whether the service is already managed

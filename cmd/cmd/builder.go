@@ -41,7 +41,7 @@ func runBuilder(cmd *cobra.Command, args []string) {
 		WriteFile:        write,
 	}
 
-	err := bld.Build()
+	err := bld.Build(0700)
 	if err != nil {
 		fmt.Println(err)
 	}

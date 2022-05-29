@@ -15,20 +15,23 @@ type InstallOpts struct {
 }
 
 type InstallResp struct {
-	Install      string
-	DaemonReload string
-	Enable       string
-	Restart      string
+	Install      string `json:"installed"`
+	DaemonReload string `json:"daemon_reload"`
+	Enable       string `json:"enabled"`
+	Restart      string `json:"restarted"`
+}
+
+//TransferFile a new service
+func (inst *conf) TransferFile() error {
+	if err := inst.add(inst.path); err != nil {
+		return fmt.Errorf("failed to add %s: %s \n ", inst.path, err.Error())
+	}
+	return nil
 }
 
 //Install a new service
 func (inst *conf) Install() *InstallResp {
 	resp := &InstallResp{}
-	if err := inst.add(inst.path); err != nil {
-		log.Errorf("failed to add %s: %s \n ", inst.path, err.Error())
-		resp.Install = err.Error()
-		return resp
-	}
 	log.Infof("added new file %s: \n ", inst.path)
 	//reload
 	err := systemctl.DaemonReload(inst.InstallOpts.Options)

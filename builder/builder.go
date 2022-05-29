@@ -3,7 +3,8 @@ package builder
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	fileutils "github.com/NubeIO/lib-dirs/dirs"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
 )
@@ -78,13 +79,37 @@ type SystemDBuilder struct {
 type WriteFile struct {
 	Write    bool   `json:"write"`
 	Path     string `json:"path"`
-	FileName string `json:"file_name"` //nubeio-rubix-bios NOT nubeio-rubix-bios.service
+	FileName string `json:"file_name"` //nubeio-rubix-bios NOT nubeio-rubix-bios.service `
 }
 
-func (inst *SystemDBuilder) Build() error {
+func checkPath(path string) error {
+	if strings.Contains(path, "//") {
+		return fmt.Errorf("path is formed incorrect, path cant have // in the path:%s", path)
+	}
+	return nil
+}
+
+func (inst *SystemDBuilder) Build(permissions os.FileMode) error {
+	err := checkPath(inst.WorkingDirectory)
+	if err != nil {
+		return err
+	}
 	if inst.ServiceName == "" {
 		return errors.New("systemctl service builder please provide a ServiceName")
 	}
+	if inst.WriteFile.Write {
+		file := fileutils.New(&fileutils.Dirs{})
+		path := inst.WriteFile.Path
+		name := inst.WriteFile.FileName
+		if name == "" {
+			return errors.New("service file name can not be nil")
+		}
+		err := file.DirExistsErr(path)
+		if err != nil {
+			return err
+		}
+	}
+
 	if inst.Description == "" {
 		inst.Description = fmt.Sprintf("nube-io app %s", inst.ServiceName)
 	}
@@ -134,19 +159,20 @@ func (inst *SystemDBuilder) Build() error {
 		inst.SyslogIdentifier,
 		inst.WantedBy,
 	)
-	fmt.Println("------------------------------")
-	fmt.Println(serviceFile)
-	fmt.Println("------------------------------")
+	log.Infoln("------------------------------")
+	log.Infoln(serviceFile)
+	log.Infoln("------------------------------")
 	if inst.WriteFile.Write {
 		path := inst.WriteFile.Path
 		name := inst.WriteFile.FileName
+		file := fileutils.New(&fileutils.Dirs{})
 		servicePath := fmt.Sprintf("%s/%v.service", path, name)
-		fmt.Println("------------------------------")
-		fmt.Println("build and add new file here:", servicePath)
-		fmt.Println("------------------------------")
-		err := ioutil.WriteFile(servicePath, []byte(serviceFile), os.ModePerm)
+		log.Infoln("------------------------------")
+		log.Infoln("build and add new file here:", servicePath)
+		log.Infoln("------------------------------")
+		err := file.WriteFile(servicePath, serviceFile, permissions)
 		if err != nil {
-			fmt.Println("write file error", err)
+			log.Errorf("write service file error %s", err.Error())
 			return err
 		}
 	}

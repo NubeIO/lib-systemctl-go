@@ -96,13 +96,13 @@ func run(cmd *cobra.Command, args []string) {
 
 	if remove {
 		fmt.Println("try and remove a file:", serviceName)
-		err := service.Remove()
-		fmt.Println(err)
+		//err := service.Remove()
+		//fmt.Println(err)
 	}
 	if fullRemove {
 		fmt.Println("try and remove a file:", serviceName)
-		err := service.Remove()
-		fmt.Println(err)
+		//err := service.Remove()
+		//fmt.Println(err)
 	}
 
 }
