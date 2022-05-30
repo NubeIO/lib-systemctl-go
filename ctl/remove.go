@@ -15,17 +15,27 @@ type RemoveOpts struct {
 }
 
 type RemoveRes struct {
-	Stop                 bool `json:"stop"`
-	Disable              bool `json:"disable"`
-	DaemonReload         bool `json:"daemon_reload"`
-	RestartFailed        bool `json:"restart_failed"`
-	DeleteServiceFile    bool `json:"delete_service_file"`
-	DeleteServiceFileUsr bool `json:"delete_service_file_usr"`
+	ServiceWasInstalled  string `json:"service_was_installed"`
+	Stop                 bool   `json:"stop"`
+	Disable              bool   `json:"disable"`
+	DaemonReload         bool   `json:"daemon_reload"`
+	RestartFailed        bool   `json:"restart_failed"`
+	DeleteServiceFile    bool   `json:"delete_service_file"`
+	DeleteServiceFileUsr bool   `json:"delete_service_file_usr"`
 }
 
 func (inst *conf) Remove() (*RemoveRes, error) {
 	res := &RemoveRes{}
-	err := systemctl.Stop(inst.service, inst.RemoveOpts.RemoveOpts)
+	wasInstalled, err := systemctl.IsInstalled(inst.service, inst.RemoveOpts.RemoveOpts)
+	if err != nil {
+		log.Errorln("failed to check if service was installed:", inst.service)
+	}
+	if wasInstalled {
+		res.ServiceWasInstalled = fmt.Sprintf("service was installed: %s", inst.service)
+	} else {
+		res.ServiceWasInstalled = fmt.Sprintf("service was not alreay installed but we will try and stop and remove anyway: %s", inst.service)
+	}
+	err = systemctl.Stop(inst.service, inst.RemoveOpts.RemoveOpts)
 	if err != nil {
 		log.Errorln("failed to stop:", inst.service)
 	} else {
@@ -50,25 +60,26 @@ func (inst *conf) Remove() (*RemoveRes, error) {
 		res.RestartFailed = true
 	}
 	//remove service file from /lib/system
-	err = inst.removeLib()
+	err = inst.RemoveLib()
 	if err != nil {
 		log.Errorln("failed to delete-file /lib/systemd/system/", inst.service)
 	} else {
 		res.DeleteServiceFile = true
 	}
 	//remove service file from /usr/lib/system
-	err = inst.removeUsrLib()
-	if err != nil {
-		log.Errorln("failed to delete-file usr/lib/systemd/system/", inst.service)
-	} else {
-		res.DeleteServiceFileUsr = true
+	if true { //TODO this is probs not needed
+		err = inst.removeUsrLib()
+		if err != nil {
+			log.Errorln("failed to delete-file /usr/lib/systemd/system/", inst.service)
+		} else {
+			res.DeleteServiceFileUsr = true
+		}
 	}
 	return res, nil
-
 }
 
 //removeLib service from /lib/system
-func (inst *conf) removeLib() error {
+func (inst *conf) RemoveLib() error {
 	inst.locker.Lock()
 	defer inst.locker.Unlock()
 	name := inst.service

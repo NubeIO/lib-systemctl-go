@@ -98,7 +98,7 @@ func (inst *SystemDBuilder) Build(permissions os.FileMode) error {
 		return errors.New("systemctl service builder please provide a ServiceName")
 	}
 	if inst.WriteFile.Write {
-		file := fileutils.New(&fileutils.Dirs{})
+		file := fileutils.New()
 		path := inst.WriteFile.Path
 		name := inst.WriteFile.FileName
 		if name == "" {
@@ -159,17 +159,15 @@ func (inst *SystemDBuilder) Build(permissions os.FileMode) error {
 		inst.SyslogIdentifier,
 		inst.WantedBy,
 	)
-	log.Infoln("------------------------------")
+	log.Infoln("-----------build service file--------------")
 	log.Infoln(serviceFile)
-	log.Infoln("------------------------------")
+	log.Infoln("-----------build service file--------------")
 	if inst.WriteFile.Write {
 		path := inst.WriteFile.Path
 		name := inst.WriteFile.FileName
-		file := fileutils.New(&fileutils.Dirs{})
+		file := fileutils.New()
 		servicePath := fmt.Sprintf("%s/%v.service", path, name)
-		log.Infoln("------------------------------")
 		log.Infoln("build and add new file here:", servicePath)
-		log.Infoln("------------------------------")
 		err := file.WriteFile(servicePath, serviceFile, permissions)
 		if err != nil {
 			log.Errorf("write service file error %s", err.Error())
