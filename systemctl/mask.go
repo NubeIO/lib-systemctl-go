@@ -11,7 +11,7 @@ import (
 // Notably, Mask may return ErrDoesNotExist if a unit doesn't exist, but it will
 // continue masking anyway. Calling Mask on a non-existing masked unit does not
 // return an error. Similarly, see Unmask.
-func Mask(unit string, opts Options) error {
+func (inst *Ctl) Mask(unit string, opts Options) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"mask", "--system", unit}
@@ -29,7 +29,7 @@ func Mask(unit string, opts Options) error {
 // doesn't exist, but only if it's not already masked.
 // If the unit doesn't exist, but it's masked anyway, no error will be
 // returned. Gross, I know. Take it up with Pottering.
-func Unmask(unit string, opts Options) error {
+func (inst *Ctl) Unmask(unit string, opts Options) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"unmask", "--system", unit}

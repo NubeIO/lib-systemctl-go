@@ -6,7 +6,7 @@ import (
 )
 
 // RestartFailed to remove the failed status. To reset all units with failed status:
-func RestartFailed(opts Options) error {
+func (inst *Ctl) RestartFailed(opts Options) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"reset-failed", "--system"}
@@ -23,7 +23,7 @@ func RestartFailed(opts Options) error {
 // files, and recreate the entire dependency tree. While the daemon is being
 // reloaded, all sockets systemd listens on behalf of user configuration will
 // stay accessible.
-func DaemonReload(opts Options) error {
+func (inst *Ctl) DaemonReload(opts Options) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"daemon-reload", "--system"}
@@ -36,7 +36,7 @@ func DaemonReload(opts Options) error {
 
 // Restart Stop and then start one or more units specified on the command line.
 // If the units are not running yet, they will be started.
-func Restart(unit string, opts Options) error {
+func (inst *Ctl) Restart(unit string, opts Options) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"restart", "--system", unit}

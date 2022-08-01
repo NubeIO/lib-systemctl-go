@@ -35,7 +35,6 @@ func execute(ctx context.Context, args []string) (string, string, int, error) {
 
 	if systemctl == "" {
 		log.Errorln(ErrNotInstalled)
-		//return "", "", 0, ErrNotInstalled
 	}
 	cmd := exec.CommandContext(ctx, systemctl, args...)
 	cmd.Stdout = &stdout

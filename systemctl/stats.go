@@ -45,7 +45,7 @@ type SystemState struct {
 }
 
 // State get status
-func State(unit string, opts Options) (SystemState, error) {
+func (inst *Ctl) State(unit string, opts Options) (SystemState, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"show", unit, "--no-page"}
