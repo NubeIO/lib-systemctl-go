@@ -28,7 +28,7 @@ func (inst *Ctl) ServiceMassAction(serviceNames []string, action string, timeout
 	var msg MassSystemResponse
 	for _, name := range serviceNames {
 		msg.Service = name
-		err := inst.CtlAction(action, name, timeout)
+		_, err := inst.CtlAction(action, name, timeout)
 		if err != nil {
 			msg.Ok = false
 			msg.Message = err.Error()
@@ -42,12 +42,13 @@ func (inst *Ctl) ServiceMassAction(serviceNames []string, action string, timeout
 }
 
 // ServiceMassCheck check if a service isRunning, isEnabled and so on
-func (inst *Ctl) ServiceMassCheck(serviceNames []string, action string) ([]MassSystemResponseChecks, error) {
+func (inst *Ctl) ServiceMassCheck(serviceNames []string, action string, timeout int) ([]MassSystemResponseChecks, error) {
+	systemOpts.Timeout = timeout
 	var out []MassSystemResponseChecks
 	var msg MassSystemResponseChecks
 	for _, name := range serviceNames {
 		msg.Service = name
-		ctlAction, err := inst.CtlStatus(action, name)
+		ctlAction, err := inst.CtlStatus(action, name, timeout)
 		if err != nil {
 			msg.Ok = false
 			msg.Message = err.Error()
@@ -60,19 +61,30 @@ func (inst *Ctl) ServiceMassCheck(serviceNames []string, action string) ([]MassS
 	return out, nil
 }
 
-func (inst *Ctl) CtlAction(action, unit string, timeout int) error {
+func (inst *Ctl) CtlAction(action, unit string, timeout int) (*SystemResponse, error) {
 	systemOpts.Timeout = timeout
+	resp := &SystemResponse{}
+	var err error
 	switch action {
 	case start.String():
-		return inst.Start(unit, systemOpts)
+		err = inst.Start(unit, systemOpts)
 	case stop.String():
-		return inst.Stop(unit, systemOpts)
+		err = inst.Stop(unit, systemOpts)
 	case enable.String():
-		return inst.Enable(unit, systemOpts)
+		err = inst.Enable(unit, systemOpts)
 	case disable.String():
-		return inst.Disable(unit, systemOpts)
+		err = inst.Disable(unit, systemOpts)
+	default:
+		return nil, errors.New("no valid action found try, start, stop, enable or disable")
 	}
-	return errors.New("no valid action found try, start, stop, enable or disable")
+	if err == nil {
+		resp.Message = fmt.Sprintf("service:%s failed to:%s", unit, action)
+		return resp, err
+	} else {
+		resp.Ok = true
+		resp.Message = fmt.Sprintf("service:%s action:%s ok!", unit, action)
+		return resp, err
+	}
 }
 
 type SystemResponseChecks struct {
@@ -80,7 +92,8 @@ type SystemResponseChecks struct {
 	Message string `json:"message"`
 }
 
-func (inst *Ctl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
+func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChecks, error) {
+	systemOpts.Timeout = timeout
 	actionResp := &SystemResponseChecks{}
 	switch action {
 	case isRunning.String():
