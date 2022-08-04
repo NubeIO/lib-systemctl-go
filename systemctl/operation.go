@@ -42,7 +42,7 @@ func (inst *Ctl) ServiceMassAction(serviceNames []string, action string, timeout
 }
 
 // ServiceMassCheck check if a service isRunning, isEnabled and so on
-func (inst *Ctl) ServiceMassCheck(serviceNames []string, action string, timeout int) ([]MassSystemResponseChecks, error) {
+func (inst *Ctl) ServiceMassStatus(serviceNames []string, action string, timeout int) ([]MassSystemResponseChecks, error) {
 	systemOpts.Timeout = timeout
 	var out []MassSystemResponseChecks
 	var msg MassSystemResponseChecks
@@ -61,6 +61,7 @@ func (inst *Ctl) ServiceMassCheck(serviceNames []string, action string, timeout 
 	return out, nil
 }
 
+// CtlAction start, stop, enable, disable a service
 func (inst *Ctl) CtlAction(action, unit string, timeout int) (*SystemResponse, error) {
 	systemOpts.Timeout = timeout
 	resp := &SystemResponse{}
@@ -92,6 +93,7 @@ type SystemResponseChecks struct {
 	Message string `json:"message"`
 }
 
+// CtlStatus check isRunning, isInstalled, isEnabled, isActive, isFailed for a service
 func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChecks, error) {
 	systemOpts.Timeout = timeout
 	actionResp := &SystemResponseChecks{}
