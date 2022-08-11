@@ -41,7 +41,7 @@ func (inst *Ctl) ServiceMassAction(serviceNames []string, action string, timeout
 	return out, nil
 }
 
-// ServiceMassCheck check if a service isRunning, isEnabled and so on
+// ServiceMassStatus check if a service isRunning, isEnabled and so on
 func (inst *Ctl) ServiceMassStatus(serviceNames []string, action string, timeout int) ([]MassSystemResponseChecks, error) {
 	systemOpts.Timeout = timeout
 	var out []MassSystemResponseChecks
@@ -78,7 +78,7 @@ func (inst *Ctl) CtlAction(action, unit string, timeout int) (*SystemResponse, e
 	default:
 		return nil, errors.New("no valid action found try, start, stop, enable or disable")
 	}
-	if err == nil {
+	if err != nil {
 		resp.Message = fmt.Sprintf("service:%s failed to:%s", unit, action)
 		return resp, err
 	} else {
@@ -105,7 +105,6 @@ func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChe
 		}
 		actionResp.Is = running
 		actionResp.Message = status
-
 	case isInstalled.String():
 		installed, err := inst.IsInstalled(unit, systemOpts)
 		if err != nil {
@@ -114,7 +113,6 @@ func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChe
 		}
 		actionResp.Is = installed
 		actionResp.Message = "is installed"
-
 	case isEnabled.String():
 		enabled, err := inst.IsEnabled(unit, systemOpts)
 		if err != nil {
@@ -123,7 +121,6 @@ func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChe
 		}
 		actionResp.Is = enabled
 		actionResp.Message = "is enabled"
-
 	case isActive.String():
 		active, sts, err := inst.IsActive(unit, systemOpts)
 		if err != nil {
@@ -132,7 +129,6 @@ func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChe
 		}
 		actionResp.Is = active
 		actionResp.Message = sts
-
 	case isFailed.String():
 		failed, err := inst.IsFailed(unit, systemOpts)
 		if err != nil {
@@ -141,9 +137,10 @@ func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChe
 		}
 		actionResp.Is = failed
 		actionResp.Message = "is failed"
-
+	default:
+		return nil, errors.New("no valid action found try, isRunning, isInstalled, isEnabled, isActive or isFailed")
 	}
-	return actionResp, errors.New("no valid action found try, isRunning, isInstalled, isEnabled, isActive or isFailed")
+	return actionResp, nil
 }
 
 func (inst *Ctl) ServiceStats(serviceName string, timeout int) (resp SystemState, err error) {
