@@ -5,7 +5,7 @@ type Ctl struct {
 	Timeout  int
 }
 
-var defaultTimeout = 30
+var defaultTimeout = 3
 var userMode = false
 
 var systemOpts = Options{

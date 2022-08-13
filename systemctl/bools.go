@@ -3,6 +3,7 @@ package systemctl
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -124,10 +125,9 @@ func (inst *Ctl) IsInstalled(unit string, opts Options) (bool, error) {
 	if opts.UserMode {
 		args[1] = "--user"
 	}
-	_, _, _, err := execute(ctx, args)
-
-	if err != nil {
-		return false, errors.New("service is not installed")
+	stdout, _, _, _ := execute(ctx, args)
+	if stdout == "" {
+		return false, errors.New(fmt.Sprintf("%s: service is not installed", unit))
 	}
 	return true, nil
 }

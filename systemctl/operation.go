@@ -24,6 +24,12 @@ type MassSystemResponseChecks struct {
 
 // ServiceMassAction mass start, stop, enable, disable, a service
 func (inst *Ctl) ServiceMassAction(serviceNames []string, action string, timeout int) ([]MassSystemResponse, error) {
+	if len(serviceNames) == 0 {
+		return nil, errors.New("no service names where provided")
+	}
+	if timeout == 0 {
+		timeout = defaultTimeout
+	}
 	var out []MassSystemResponse
 	var msg MassSystemResponse
 	for _, name := range serviceNames {
@@ -43,6 +49,12 @@ func (inst *Ctl) ServiceMassAction(serviceNames []string, action string, timeout
 
 // ServiceMassStatus check if a service isRunning, isEnabled and so on
 func (inst *Ctl) ServiceMassStatus(serviceNames []string, action string, timeout int) ([]MassSystemResponseChecks, error) {
+	if len(serviceNames) == 0 {
+		return nil, errors.New("no service names where provided")
+	}
+	if timeout == 0 {
+		timeout = defaultTimeout
+	}
 	systemOpts.Timeout = timeout
 	var out []MassSystemResponseChecks
 	var msg MassSystemResponseChecks
@@ -63,6 +75,9 @@ func (inst *Ctl) ServiceMassStatus(serviceNames []string, action string, timeout
 
 // CtlAction start, stop, enable, disable a service
 func (inst *Ctl) CtlAction(action, unit string, timeout int) (*SystemResponse, error) {
+	if timeout == 0 {
+		timeout = defaultTimeout
+	}
 	systemOpts.Timeout = timeout
 	resp := &SystemResponse{}
 	var err error
@@ -95,6 +110,9 @@ type SystemResponseChecks struct {
 
 // CtlStatus check isRunning, isInstalled, isEnabled, isActive, isFailed for a service
 func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChecks, error) {
+	if timeout == 0 {
+		timeout = defaultTimeout
+	}
 	systemOpts.Timeout = timeout
 	actionResp := &SystemResponseChecks{}
 	switch action {
@@ -143,7 +161,25 @@ func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChe
 	return actionResp, nil
 }
 
-func (inst *Ctl) ServiceStats(serviceName string, timeout int) (resp SystemState, err error) {
+func (inst *Ctl) ServiceStateMass(serviceNames []string, timeout int) (resp []SystemState, err error) {
+	if timeout == 0 {
+		timeout = defaultTimeout
+	}
+	if len(serviceNames) == 0 {
+		return nil, errors.New("no service names where provided")
+	}
+	systemOpts.Timeout = timeout
+	for _, name := range serviceNames {
+		state, err := inst.ServiceState(name, timeout)
+		if err != nil {
+			return nil, err
+		}
+		resp = append(resp, state)
+	}
+	return resp, nil
+}
+
+func (inst *Ctl) ServiceState(serviceName string, timeout int) (resp SystemState, err error) {
 	systemOpts.Timeout = timeout
 	resp, err = inst.State(serviceName, systemOpts)
 	if err != nil {

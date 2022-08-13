@@ -36,16 +36,28 @@ const (
 )
 
 type SystemState struct {
-	State                  UnitFileState `json:"state"`        //enabled, disabled
-	ActiveState            ActiveState   `json:"active_state"` // active, inactive
-	SubState               SubState      `json:"sub_state"`    //running, //dead
-	ActiveEnterTimestamp   string        `json:"active_enter_timestamp"`
-	InactiveEnterTimestamp string        `json:"inactive_enter_timestamp"`
-	Restarts               string        `json:"restarts"` //NRestarts number of restart
+	ServiceName            string        `json:"service_name,omitempty"`
+	State                  UnitFileState `json:"state,omitempty"`        //enabled, disabled
+	ActiveState            ActiveState   `json:"active_state,omitempty"` // active, inactive
+	SubState               SubState      `json:"sub_state,omitempty"`    //running, //dead
+	ActiveEnterTimestamp   string        `json:"active_enter_timestamp,omitempty"`
+	InactiveEnterTimestamp string        `json:"inactive_enter_timestamp,omitempty"`
+	Restarts               string        `json:"restarts,omitempty"` //NRestarts number of restart
+	IsInstalled            bool          `json:"is_installed"`
 }
 
 // State get status
 func (inst *Ctl) State(unit string, opts Options) (SystemState, error) {
+	stats := SystemState{
+		ServiceName: unit,
+	}
+	_, err := inst.IsInstalled(unit, opts)
+	if err != nil {
+		stats.IsInstalled = false
+		return stats, nil
+	} else {
+		stats.IsInstalled = true
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"show", unit, "--no-page"}
@@ -53,7 +65,6 @@ func (inst *Ctl) State(unit string, opts Options) (SystemState, error) {
 		args[1] = "--user"
 	}
 	stdout, _, _, err := execute(ctx, args)
-	stats := SystemState{}
 
 	unitState := UnitFileState("")
 	activeState := ActiveState("")

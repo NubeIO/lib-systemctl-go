@@ -2,6 +2,7 @@ package systemctl
 
 import (
 	"fmt"
+	pprint "github.com/NubeIO/lib-systemctl-go/print"
 	"testing"
 )
 
@@ -24,7 +25,6 @@ func TestCtl_CtlAction(t *testing.T) {
 		UserMode: false,
 		Timeout:  30,
 	})
-
 	action, err := service.CtlAction("start", "nubeio-flow-framework", 10)
 	fmt.Println(err)
 	if err != nil {
@@ -32,4 +32,32 @@ func TestCtl_CtlAction(t *testing.T) {
 	}
 	fmt.Println(action.Ok)
 	fmt.Println(action.Message)
+}
+
+func TestCtl_ServiceState(t *testing.T) {
+	service := New(&Ctl{
+		UserMode: false,
+		Timeout:  30,
+	})
+	action, err := service.ServiceState("nubeio-flow-framework", 10)
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
+	pprint.PrintJOSN(action)
+
+}
+
+func TestCtl_ServiceStateMass(t *testing.T) {
+	service := New(&Ctl{
+		UserMode: false,
+		Timeout:  30,
+	})
+	action, err := service.ServiceStateMass([]string{"nubeio-flow-framework"}, 10)
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
+	pprint.PrintJOSN(action)
+
 }

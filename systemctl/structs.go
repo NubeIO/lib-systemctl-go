@@ -1,6 +1,6 @@
 package systemctl
 
 type Options struct {
-	UserMode bool
-	Timeout  int
+	UserMode bool `json:"user_mode"`
+	Timeout  int  `json:"timeout"`
 }
