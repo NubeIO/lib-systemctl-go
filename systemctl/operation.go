@@ -78,6 +78,9 @@ func (inst *Ctl) CtlAction(action, unit string, timeout int) (*SystemResponse, e
 	if timeout == 0 {
 		timeout = defaultTimeout
 	}
+	if unit == "" {
+		return nil, errors.New("service-name can not be empty")
+	}
 	systemOpts.Timeout = timeout
 	resp := &SystemResponse{}
 	var err error
@@ -112,6 +115,9 @@ type SystemResponseChecks struct {
 func (inst *Ctl) CtlStatus(action, unit string, timeout int) (*SystemResponseChecks, error) {
 	if timeout == 0 {
 		timeout = defaultTimeout
+	}
+	if unit == "" {
+		return nil, errors.New("service-name can not be empty")
 	}
 	systemOpts.Timeout = timeout
 	actionResp := &SystemResponseChecks{}
