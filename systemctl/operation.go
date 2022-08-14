@@ -85,14 +85,16 @@ func (inst *Ctl) CtlAction(action, unit string, timeout int) (*SystemResponse, e
 	resp := &SystemResponse{}
 	var err error
 	switch action {
-	case start.String():
+	case "start":
 		err = inst.Start(unit, systemOpts)
-	case stop.String():
+	case "stop":
 		err = inst.Stop(unit, systemOpts)
-	case enable.String():
+	case "enable":
 		err = inst.Enable(unit, systemOpts)
-	case disable.String():
+	case "disable":
 		err = inst.Disable(unit, systemOpts)
+	case "restart":
+		err = inst.Restart(unit, systemOpts)
 	default:
 		return nil, errors.New("no valid action found try, start, stop, enable or disable")
 	}

@@ -25,7 +25,7 @@ func TestCtl_CtlAction(t *testing.T) {
 		UserMode: false,
 		Timeout:  30,
 	})
-	action, err := service.CtlAction("start", "nubeio-flow-framework", 10)
+	action, err := service.CtlAction("restart", "nubeio-flow-framework", 10)
 	fmt.Println(err)
 	if err != nil {
 		return
