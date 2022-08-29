@@ -18,8 +18,8 @@ var (
 	disable     bool
 	add         bool
 	remove      bool
-	fullRemove  bool //stop, disable and remove the file
-	fullInstall bool //add the new file start, enable
+	fullRemove  bool // stop, disable and remove the file
+	fullInstall bool // add the new file start, enable
 	path        string
 )
 
@@ -96,13 +96,13 @@ func run(cmd *cobra.Command, args []string) {
 
 	if remove {
 		fmt.Println("try and remove a file:", serviceName)
-		//err := service.Remove()
-		//fmt.Println(err)
+		// err := service.Remove()
+		// fmt.Println(err)
 	}
 	if fullRemove {
 		fmt.Println("try and remove a file:", serviceName)
-		//err := service.Remove()
-		//fmt.Println(err)
+		// err := service.Remove()
+		// fmt.Println(err)
 	}
 
 }
@@ -124,5 +124,4 @@ func init() {
 
 	serviceCmd.Flags().BoolVarP(&remove, "remove", "", false, "remove a new service")
 	serviceCmd.Flags().BoolVarP(&fullRemove, "remove-force", "", false, "remove a the service, actions are stop, disable, delete the files and daemon-reload")
-
 }

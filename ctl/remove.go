@@ -63,15 +63,15 @@ func (inst *conf) Remove() (*RemoveRes, error) {
 	} else {
 		res.RestartFailed = true
 	}
-	//remove service file from /lib/system
+	// remove service file from /lib/system
 	err = inst.RemoveLib()
 	if err != nil {
 		log.Errorln("failed to delete-file /lib/systemd/system/", inst.service)
 	} else {
 		res.DeleteServiceFile = true
 	}
-	//remove service file from /usr/lib/system
-	if true { //TODO this is probs not needed
+	// remove service file from /usr/lib/system
+	if true { // TODO this is probs not needed
 		err = inst.removeUsrLib()
 		if err != nil {
 			log.Errorln("failed to delete-file /usr/lib/systemd/system/", inst.service)
@@ -82,7 +82,7 @@ func (inst *conf) Remove() (*RemoveRes, error) {
 	return res, nil
 }
 
-//removeLib service from /lib/system
+// RemoveLib service from /lib/system
 func (inst *conf) RemoveLib() error {
 	inst.locker.Lock()
 	defer inst.locker.Unlock()
@@ -101,7 +101,7 @@ func (inst *conf) RemoveLib() error {
 	return nil
 }
 
-//removeUsrLib service from /lib/system
+// removeUsrLib service from /lib/system
 func (inst *conf) removeUsrLib() error {
 	inst.locker.Lock()
 	defer inst.locker.Unlock()
@@ -115,5 +115,4 @@ func (inst *conf) removeUsrLib() error {
 
 	}
 	return nil
-
 }

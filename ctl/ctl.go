@@ -35,11 +35,11 @@ func newConf() *conf {
 
 	stat, err := os.Stat(dir)
 	if err != nil {
-		if os.IsNotExist(err) { //if not exists make dir
-			//if err := os.Mkdir(dir, 0755); err != nil {
+		if os.IsNotExist(err) { // if not exists make dir
+			// if err := os.Mkdir(dir, 0755); err != nil {
 			//	fmt.Println(" Failed to initialize configuration:", err.Error())
 			//	os.Exit(1)
-			//}
+			// }
 			return c
 		}
 		fmt.Printf(" Failed to load local configuration: %s\n", err.Error())
@@ -64,7 +64,7 @@ func newConf() *conf {
 	return c
 }
 
-//Has Whether the service is already managed
+// Has Whether the service is already managed
 func (inst *conf) Has(name string) *service {
 	name = strings.TrimSuffix(name, ".service")
 	for _, existed := range inst.services {
@@ -75,7 +75,7 @@ func (inst *conf) Has(name string) *service {
 	return nil
 }
 
-//List  of managed services
+// List  of managed services
 func (inst *conf) List() []*service {
 	return inst.services
 }

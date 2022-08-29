@@ -117,7 +117,7 @@ func (inst *Ctl) IsFailed(unit string, opts Options) (bool, error) {
 	return false, err
 }
 
-//IsInstalled checks if the program is installed
+// IsInstalled checks if the program is installed
 func (inst *Ctl) IsInstalled(unit string, opts Options) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
 	defer cancel()

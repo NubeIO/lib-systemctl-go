@@ -44,7 +44,7 @@ func TestCtl_ServiceState(t *testing.T) {
 	if err != nil {
 		return
 	}
-	pprint.PrintJOSN(action)
+	pprint.PrintJSON(action)
 
 }
 
@@ -58,6 +58,5 @@ func TestCtl_ServiceStateMass(t *testing.T) {
 	if err != nil {
 		return
 	}
-	pprint.PrintJOSN(action)
-
+	pprint.PrintJSON(action)
 }

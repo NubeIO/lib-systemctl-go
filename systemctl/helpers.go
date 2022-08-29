@@ -52,7 +52,7 @@ func (inst *Ctl) GetPID(unit string, opts Options) (int, error) {
 	return strconv.Atoi(value)
 }
 
-//setTimeout limit with the timeout can be
+// setTimeout limit with the timeout can be
 func setTimeout(timeOut int) time.Duration {
 	if timeOut <= 0 || timeOut >= 120 {
 		timeOut = 10

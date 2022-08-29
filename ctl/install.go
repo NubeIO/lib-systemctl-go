@@ -21,7 +21,7 @@ type InstallResp struct {
 	Restart      string `json:"restarted"`
 }
 
-//TransferFile a new service
+// TransferFile a new service
 func (inst *conf) TransferFile() error {
 	if err := inst.add(inst.path); err != nil {
 		return fmt.Errorf("failed to add %s: %s \n ", inst.path, err.Error())
@@ -29,11 +29,11 @@ func (inst *conf) TransferFile() error {
 	return nil
 }
 
-//Install a new service
+// Install a new service
 func (inst *conf) Install() *InstallResp {
 	resp := &InstallResp{}
 	log.Infof("added new file %s: \n ", inst.path)
-	//reload
+	// reload
 	ctl := systemctl.New(&systemctl.Ctl{
 		UserMode: false,
 		Timeout:  inst.InstallOpts.Options.Timeout,
@@ -44,7 +44,7 @@ func (inst *conf) Install() *InstallResp {
 		resp.DaemonReload = err.Error()
 		return resp
 	}
-	//enable
+	// enable
 	err = ctl.Enable(inst.service, inst.InstallOpts.Options)
 	if err != nil {
 		log.Errorf("failed to enable%s: err:%s \n ", inst.service, err.Error())
@@ -52,7 +52,7 @@ func (inst *conf) Install() *InstallResp {
 		return resp
 	}
 	log.Infof("enable new service:%s \n ", inst.service)
-	//start
+	// start
 	err = ctl.Restart(inst.service, inst.InstallOpts.Options)
 	if err != nil {
 		log.Errorf("failed to start%s: err:%s \n ", inst.service, err.Error())
@@ -63,7 +63,7 @@ func (inst *conf) Install() *InstallResp {
 	return nil
 }
 
-//Add a new service
+// Add a new service
 func (inst *conf) Add(path string) error {
 	if err := inst.add(path); err != nil {
 		return err
@@ -71,7 +71,7 @@ func (inst *conf) Add(path string) error {
 	return nil
 }
 
-//Add  service hosting
+// Add  service hosting
 func (inst *conf) add(file string) error {
 	inst.locker.Lock()
 	defer inst.locker.Unlock()
@@ -87,11 +87,10 @@ func (inst *conf) add(file string) error {
 	}
 
 	replaceFile := false
-	if replaceFile { //TODO maybe give the user this option
+	if replaceFile { // TODO maybe give the user this option
 		if inst.Has(stat.Name()) != nil {
 			return fmt.Errorf("%s already exists", stat.Name())
 		}
-
 	}
 	expected := path.Join(inst.workDir, stat.Name())
 	err = copyFile(file, expected)
@@ -103,7 +102,7 @@ func (inst *conf) add(file string) error {
 	return nil
 }
 
-//copyFile copy the file
+// copyFile copy the file
 func copyFile(src, dst string) error {
 	var buf = make([]byte, 5*2^20)
 	stat, err := os.Stat(src)
