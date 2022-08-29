@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	builderPath        string
-	builderServiceName string
-	builderWrite       bool
+	write       bool
+	servicePath string
+	serviceName string
 )
 
 var builderCmd = &cobra.Command{
@@ -20,38 +20,35 @@ var builderCmd = &cobra.Command{
 }
 
 func runBuilder(cmd *cobra.Command, args []string) {
-
-	name := "aidans-service"
+	description := "Service Description"
 	user := "aidan"
 	directory := "/home/aidan"
 	execCmd := "/usr/bin/python3 something.py"
 
-	write := builder.WriteFile{
-		Write:    true,
-		Path:     builderPath,
-		FileName: builderServiceName,
+	writeFile := builder.WriteFile{
+		Write:    write,
+		Path:     path,
+		FileName: serviceName,
 	}
 
-	bld := &builder.SystemDBuilder{
-		Description:      name,
+	builderInstance := &builder.SystemDBuilder{
+		ServiceName:      serviceName,
+		Description:      description,
 		User:             user,
 		WorkingDirectory: directory,
 		ExecStart:        execCmd,
 		SyslogIdentifier: "rubix-bios",
-		WriteFile:        write,
+		WriteFile:        writeFile,
 	}
-
-	err := bld.Build(0700)
+	err := builderInstance.Build(0700)
 	if err != nil {
 		fmt.Println(err)
 	}
-
 }
 
 func init() {
 	RootCmd.AddCommand(builderCmd)
-	builderCmd.Flags().BoolVarP(&builderWrite, "write", "", false, "generate a new systemd file")
-	builderCmd.Flags().StringVarP(&builderPath, "builder-path", "", "", "provide the path of the new service file eg: /tmp/")
-	builderCmd.Flags().StringVarP(&builderServiceName, "builder-name", "", "", "rubix-updater")
-
+	builderCmd.PersistentFlags().BoolVarP(&write, "write", "", false, "generate a new systemd file")
+	builderCmd.PersistentFlags().StringVarP(&servicePath, "service-path", "", "/tmp", "provide the path of the new service file eg: /tmp/")
+	builderCmd.PersistentFlags().StringVarP(&serviceName, "service-name", "", "rubix-bios", "rubix-updater")
 }

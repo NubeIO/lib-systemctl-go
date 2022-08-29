@@ -43,42 +43,42 @@ func run(cmd *cobra.Command, args []string) {
 	service.InstallOpts = installOpts
 	service.RemoveOpts = removeOpts
 
-	if isActive {
-		out, msg, err := systemctl.IsActive(serviceName, opts)
-		fmt.Println(out, msg)
-		fmt.Println(err)
-	}
-
-	if status {
-		out, err := systemctl.Status(serviceName, opts)
-		fmt.Println(out)
-		fmt.Println(err)
-	}
-
-	if start {
-		err := systemctl.Start(serviceName, opts)
-		fmt.Println(err)
-	}
-
-	if restart {
-		err := systemctl.Restart(serviceName, opts)
-		fmt.Println(err)
-	}
-
-	if stop {
-		err := systemctl.Stop(serviceName, opts)
-		fmt.Println(err)
-	}
-
-	if enable {
-		err := systemctl.Enable(serviceName, opts)
-		fmt.Println(err)
-	}
-
-	if disable {
-		err := systemctl.Disable(serviceName, opts)
-		fmt.Println(err)
-	}
+	// if isActive {
+	// 	out, msg, err := systemctl.IsActive(serviceName, opts)
+	// 	fmt.Println(out, msg)
+	// 	fmt.Println(err)
+	// }
+	//
+	// if status {
+	// 	out, err := systemctl.Status(serviceName, opts)
+	// 	fmt.Println(out)
+	// 	fmt.Println(err)
+	// }
+	//
+	// if start {
+	// 	err := systemctl.Start(serviceName, opts)
+	// 	fmt.Println(err)
+	// }
+	//
+	// if restart {
+	// 	err := systemctl.Restart(serviceName, opts)
+	// 	fmt.Println(err)
+	// }
+	//
+	// if stop {
+	// 	err := systemctl.Stop(serviceName, opts)
+	// 	fmt.Println(err)
+	// }
+	//
+	// if enable {
+	// 	err := systemctl.Enable(serviceName, opts)
+	// 	fmt.Println(err)
+	// }
+	//
+	// if disable {
+	// 	err := systemctl.Disable(serviceName, opts)
+	// 	fmt.Println(err)
+	// }
 
 	if add {
 		err := service.Add(path)
