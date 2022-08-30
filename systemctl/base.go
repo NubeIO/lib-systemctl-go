@@ -5,16 +5,7 @@ type Ctl struct {
 	Timeout  int
 }
 
-var defaultTimeout = 3
-var userMode = false
-
-var systemOpts = Options{
-	UserMode: false,
-	Timeout:  defaultTimeout,
-}
-
-func New(inst *Ctl) *Ctl {
-	defaultTimeout = inst.Timeout
-	userMode = userMode
-	return inst
+func New(userMode bool, timeout int) *Ctl {
+	instance := Ctl{UserMode: userMode, Timeout: timeout}
+	return &instance
 }

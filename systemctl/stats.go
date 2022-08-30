@@ -37,31 +37,31 @@ const (
 
 type SystemState struct {
 	ServiceName            string        `json:"service_name,omitempty"`
-	State                  UnitFileState `json:"state,omitempty"`        //enabled, disabled
+	State                  UnitFileState `json:"state,omitempty"`        // enabled, disabled
 	ActiveState            ActiveState   `json:"active_state,omitempty"` // active, inactive
-	SubState               SubState      `json:"sub_state,omitempty"`    //running, //dead
+	SubState               SubState      `json:"sub_state,omitempty"`    // running, //dead
 	ActiveEnterTimestamp   string        `json:"active_enter_timestamp,omitempty"`
 	InactiveEnterTimestamp string        `json:"inactive_enter_timestamp,omitempty"`
-	Restarts               string        `json:"restarts,omitempty"` //NRestarts number of restart
+	Restarts               string        `json:"restarts,omitempty"` // NRestarts number of restart
 	IsInstalled            bool          `json:"is_installed"`
 }
 
 // State get status
-func (inst *Ctl) State(unit string, opts Options) (SystemState, error) {
+func (inst *Ctl) State(unit string) (SystemState, error) {
 	stats := SystemState{
 		ServiceName: unit,
 	}
-	_, err := inst.IsInstalled(unit, opts)
+	_, err := inst.IsInstalled(unit)
 	if err != nil {
 		stats.IsInstalled = false
 		return stats, nil
 	} else {
 		stats.IsInstalled = true
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"show", unit, "--no-page"}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	stdout, _, _, err := execute(ctx, args)

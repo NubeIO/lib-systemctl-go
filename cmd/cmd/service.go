@@ -9,18 +9,17 @@ import (
 )
 
 var (
-	isActive    bool
-	status      bool
-	start       bool
-	restart     bool
-	stop        bool
-	enable      bool
-	disable     bool
-	add         bool
-	remove      bool
-	fullRemove  bool //stop, disable and remove the file
-	fullInstall bool //add the new file start, enable
-	path        string
+	isActive bool
+	status   bool
+	start    bool
+	restart  bool
+	stop     bool
+	enable   bool
+	disable  bool
+	add      bool
+	remove   bool
+	install  bool
+	path     string
 )
 
 var serviceCmd = &cobra.Command{
@@ -31,80 +30,64 @@ var serviceCmd = &cobra.Command{
 }
 
 func run(cmd *cobra.Command, args []string) {
-
-	timeOut := 5
-
-	service := ctl.New(serviceName, path)
-	opts := systemctl.Options{Timeout: timeOut}
-	installOpts := ctl.InstallOpts{
-		Options: opts,
-	}
-	removeOpts := ctl.RemoveOpts{RemoveOpts: opts}
-	service.InstallOpts = installOpts
-	service.RemoveOpts = removeOpts
-
+	timeout := 5
+	systemctlObject := systemctl.New(false, timeout)
 	if isActive {
-		out, msg, err := systemctl.IsActive(serviceName, opts)
+		out, msg, err := systemctlObject.IsActive(serviceName)
 		fmt.Println(out, msg)
 		fmt.Println(err)
 	}
 
 	if status {
-		out, err := systemctl.Status(serviceName, opts)
+		out, err := systemctlObject.Status(serviceName)
 		fmt.Println(out)
 		fmt.Println(err)
 	}
 
 	if start {
-		err := systemctl.Start(serviceName, opts)
+		err := systemctlObject.Start(serviceName)
 		fmt.Println(err)
 	}
 
 	if restart {
-		err := systemctl.Restart(serviceName, opts)
+		err := systemctlObject.Restart(serviceName)
 		fmt.Println(err)
 	}
 
 	if stop {
-		err := systemctl.Stop(serviceName, opts)
+		err := systemctlObject.Stop(serviceName)
 		fmt.Println(err)
 	}
 
 	if enable {
-		err := systemctl.Enable(serviceName, opts)
+		err := systemctlObject.Enable(serviceName)
 		fmt.Println(err)
 	}
 
 	if disable {
-		err := systemctl.Disable(serviceName, opts)
+		err := systemctlObject.Disable(serviceName)
 		fmt.Println(err)
 	}
 
+	service := ctl.New(serviceName, false, timeout)
 	if add {
 		err := service.Add(path)
 		if err != nil {
-			fmt.Println("full Add error", err)
+			fmt.Println("add error", err)
 		}
 	}
 
-	if fullInstall {
+	if install {
 		err := service.Install()
 		if err != nil {
-			fmt.Println("full install error", err)
+			fmt.Println("install error", err)
 		}
 	}
 
 	if remove {
 		fmt.Println("try and remove a file:", serviceName)
-		//err := service.Remove()
-		//fmt.Println(err)
+		service.Remove()
 	}
-	if fullRemove {
-		fmt.Println("try and remove a file:", serviceName)
-		//err := service.Remove()
-		//fmt.Println(err)
-	}
-
 }
 
 func init() {
@@ -117,12 +100,8 @@ func init() {
 	serviceCmd.Flags().BoolVarP(&enable, "enable", "", false, "enable a service")
 	serviceCmd.Flags().BoolVarP(&disable, "disable", "", false, "disable a service")
 
-	serviceCmd.Flags().BoolVarP(&add, "add", "", false, "add a new service file")
-	serviceCmd.Flags().BoolVarP(&fullInstall, "install", "", false, "add a new service file and do the full install")
-
 	serviceCmd.Flags().StringVarP(&path, "path", "", "", "provide the path of the new service file eg: /tmp/rubix-updater.service")
-
+	serviceCmd.Flags().BoolVarP(&add, "add", "", false, "add a new service file")
+	serviceCmd.Flags().BoolVarP(&install, "install", "", false, "deamon-reload, enable, start service")
 	serviceCmd.Flags().BoolVarP(&remove, "remove", "", false, "remove a new service")
-	serviceCmd.Flags().BoolVarP(&fullRemove, "remove-force", "", false, "remove a the service, actions are stop, disable, delete the files and daemon-reload")
-
 }

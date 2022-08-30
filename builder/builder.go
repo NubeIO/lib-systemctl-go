@@ -3,15 +3,13 @@ package builder
 import (
 	"errors"
 	"fmt"
-	fileutils "github.com/NubeIO/lib-dirs/dirs"
+	"github.com/NubeIO/lib-files/fileutils"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
 )
 
 /*
-
-
 [Unit]
 Description=BIOS comes with default OS, non-upgradable
 After=network.target
@@ -31,6 +29,10 @@ SyslogIdentifier=rubix-bios
 WantedBy=multi-user.target
 */
 
+var (
+	fileUtils = fileutils.New()
+)
+
 func (inst *SystemDBuilder) template() string {
 	out := `[Unit]
 Description=%v
@@ -48,19 +50,19 @@ StandardError=%v
 SyslogIdentifier=%v
 [Install]
 WantedBy=%v`
-	return out
 
+	return out
 }
 
 type SystemDBuilder struct {
-	ServiceName string `json:"service_name"` //nubeio-rubix-bios
+	ServiceName string `json:"service_name"` // nubeio-rubix-bios
 
-	//[Unit]
+	// [Unit]
 	Description string `json:"description"`
-	After       string `json:"after"` //network.target
-	//[Service]
-	ExecStartPre     string `json:"exec_start_pre"` //ExecStartPre=/bin/sleep 0
-	Type             string `json:"type"`           //simple
+	After       string `json:"after"` // network.target
+	// [Service]
+	ExecStartPre     string `json:"exec_start_pre"` // ExecStartPre=/bin/sleep 0
+	Type             string `json:"type"`           // simple
 	User             string `json:"user"`
 	WorkingDirectory string `json:"working_directory"`
 	ExecStart        string `json:"exec_start"`
@@ -69,8 +71,8 @@ type SystemDBuilder struct {
 	StandardOutput   string `json:"standard_output"`
 	StandardError    string `json:"standard_error"`
 	SyslogIdentifier string `json:"syslog_identifier"`
-	//[Install]
-	WantedBy string `json:"wanted_by"` //multi-user.target
+	// [Install]
+	WantedBy string `json:"wanted_by"` // multi-user.target
 
 	// write the file to a location
 	WriteFile WriteFile `json:"write_file"`
@@ -79,12 +81,12 @@ type SystemDBuilder struct {
 type WriteFile struct {
 	Write    bool   `json:"write"`
 	Path     string `json:"path"`
-	FileName string `json:"file_name"` //nubeio-rubix-bios NOT nubeio-rubix-bios.service `
+	FileName string `json:"file_name"` // nubeio-rubix-bios NOT nubeio-rubix-bios.service
 }
 
 func checkPath(path string) error {
 	if strings.Contains(path, "//") {
-		return fmt.Errorf("path is formed incorrect, path cant have // in the path:%s", path)
+		return fmt.Errorf("path is formed incorrect, path cant have // in the path: %s", path)
 	}
 	return nil
 }
@@ -98,13 +100,12 @@ func (inst *SystemDBuilder) Build(permissions os.FileMode) error {
 		return errors.New("systemctl service builder please provide a ServiceName")
 	}
 	if inst.WriteFile.Write {
-		file := fileutils.New()
 		path := inst.WriteFile.Path
 		name := inst.WriteFile.FileName
 		if name == "" {
 			return errors.New("service file name can not be nil")
 		}
-		err := file.DirExistsErr(path)
+		err := fileUtils.DirExistsErr(path)
 		if err != nil {
 			return err
 		}
@@ -165,15 +166,13 @@ func (inst *SystemDBuilder) Build(permissions os.FileMode) error {
 	if inst.WriteFile.Write {
 		path := inst.WriteFile.Path
 		name := inst.WriteFile.FileName
-		file := fileutils.New()
 		servicePath := fmt.Sprintf("%s/%v.service", path, name)
 		log.Infoln("build and add new file here:", servicePath)
-		err := file.WriteFile(servicePath, serviceFile, permissions)
+		err = fileUtils.WriteFile(servicePath, serviceFile, permissions)
 		if err != nil {
 			log.Errorf("write service file error %s", err.Error())
 			return err
 		}
 	}
 	return nil
-
 }

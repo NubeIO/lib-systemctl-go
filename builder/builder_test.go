@@ -1,12 +1,11 @@
 package builder
 
 import (
-	"fmt"
-	"strings"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestSystemDBuilder(*testing.T) {
+func TestSystemDBuilder(t *testing.T) {
 	description := "BIOS comes with default OS, non-upgradable"
 	user := "root"
 	directory := "/data/rubix-bios-app/v1.5.2"
@@ -26,26 +25,5 @@ func TestSystemDBuilder(*testing.T) {
 	}
 
 	err := bld.Build(0700)
-	fmt.Println(err)
-	if err != nil {
-		return
-	}
-
-	fmt.Println(strings.Contains("/home/aidan/aidan-test/aidan_test//", "//"))
-
-	//base := "/home"
-	//path := "aa"
-	//rel, err := filepath.Rel(base, path)
-	//fmt.Printf("Base %q: Path %q: Rel %q Err %v\n", base, path, rel, err)
-	//if err != nil {
-	//	fmt.Println("PROCEED")
-	//	return
-	//}
-
-}
-
-func TestFullInstall(*testing.T) {
-
-	//}
-
+	assert.Nil(t, err)
 }
