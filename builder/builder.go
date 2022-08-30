@@ -29,10 +29,6 @@ SyslogIdentifier=rubix-bios
 WantedBy=multi-user.target
 */
 
-var (
-	fileUtils = fileutils.New()
-)
-
 func (inst *SystemDBuilder) template() string {
 	out := `[Unit]
 Description=%v
@@ -105,7 +101,7 @@ func (inst *SystemDBuilder) Build(permissions os.FileMode) error {
 		if name == "" {
 			return errors.New("service file name can not be nil")
 		}
-		err := fileUtils.DirExistsErr(path)
+		err := fileutils.DirExistsErr(path)
 		if err != nil {
 			return err
 		}
@@ -168,7 +164,7 @@ func (inst *SystemDBuilder) Build(permissions os.FileMode) error {
 		name := inst.WriteFile.FileName
 		servicePath := fmt.Sprintf("%s/%v.service", path, name)
 		log.Infoln("build and add new file here:", servicePath)
-		err = fileUtils.WriteFile(servicePath, serviceFile, permissions)
+		err = fileutils.WriteFile(servicePath, serviceFile, permissions)
 		if err != nil {
 			log.Errorf("write service file error %s", err.Error())
 			return err

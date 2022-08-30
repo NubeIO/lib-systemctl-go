@@ -3,7 +3,7 @@ module github.com/NubeIO/lib-systemctl-go
 go 1.17
 
 require (
-	github.com/NubeIO/lib-files v0.1.0
+	github.com/NubeIO/lib-files v0.1.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.2.2
