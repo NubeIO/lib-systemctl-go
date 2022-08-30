@@ -21,10 +21,10 @@ type InstallResp struct {
 	Restart      string `json:"restarted"`
 }
 
-// TransferFile a new service
-func (inst *conf) TransferFile() error {
-	if err := inst.add(inst.path); err != nil {
-		return fmt.Errorf("failed to add %s: %s \n ", inst.path, err.Error())
+// TransferSystemdFile a new service
+func (inst *conf) TransferSystemdFile(file string) error {
+	if err := inst.add(file); err != nil {
+		return fmt.Errorf("failed to add %s: %s \n ", file, err.Error())
 	}
 	return nil
 }
@@ -32,34 +32,34 @@ func (inst *conf) TransferFile() error {
 // Install a new service
 func (inst *conf) Install() *InstallResp {
 	resp := &InstallResp{}
-	log.Infof("added new file %s: \n ", inst.path)
+	log.Infof("installing %s: \n ", inst.service)
+
 	// reload
-	ctl := systemctl.New(&systemctl.Ctl{
-		UserMode: false,
-		Timeout:  inst.InstallOpts.Options.Timeout,
-	})
+	ctl := systemctl.New(false, inst.InstallOpts.Options.Timeout)
 	err := ctl.DaemonReload(inst.InstallOpts.Options)
 	if err != nil {
-		log.Errorf("failed to DaemonReload%s: err:%s \n ", inst.service, err.Error())
+		log.Errorf("failed to deamon-reload %s: err: %s \n ", inst.service, err.Error())
 		resp.DaemonReload = err.Error()
 		return resp
 	}
+
 	// enable
 	err = ctl.Enable(inst.service, inst.InstallOpts.Options)
 	if err != nil {
-		log.Errorf("failed to enable%s: err:%s \n ", inst.service, err.Error())
+		log.Errorf("failed to enable %s: err: %s \n ", inst.service, err.Error())
 		resp.Enable = err.Error()
 		return resp
 	}
-	log.Infof("enable new service:%s \n ", inst.service)
+	log.Infof("enable new service: %s \n ", inst.service)
+
 	// start
 	err = ctl.Restart(inst.service, inst.InstallOpts.Options)
 	if err != nil {
-		log.Errorf("failed to start%s: err:%s \n ", inst.service, err.Error())
+		log.Errorf("failed to start %s: err: %s \n ", inst.service, err.Error())
 		resp.Restart = err.Error()
 		return resp
 	}
-	log.Infof("start new service:%s \n ", inst.service)
+	log.Infof("start new service: %s \n ", inst.service)
 	return nil
 }
 
@@ -76,7 +76,7 @@ func (inst *conf) add(file string) error {
 	inst.locker.Lock()
 	defer inst.locker.Unlock()
 	if filepath.Ext(file) != ".service" {
-		return fmt.Errorf(" must add a valid service file")
+		return fmt.Errorf("must add a valid service file")
 	}
 	stat, err := os.Stat(file)
 	if err != nil {
@@ -85,17 +85,10 @@ func (inst *conf) add(file string) error {
 	if stat.IsDir() {
 		return fmt.Errorf("must add a valid service file")
 	}
-
-	replaceFile := false
-	if replaceFile { // TODO maybe give the user this option
-		if inst.Has(stat.Name()) != nil {
-			return fmt.Errorf("%s already exists", stat.Name())
-		}
-	}
-	expected := path.Join(inst.workDir, stat.Name())
+	expected := path.Join(inst.systemdDir, stat.Name())
 	err = copyFile(file, expected)
 	if err != nil {
-		fmt.Println("copyfile", err)
+		fmt.Println("copy file", err)
 		return err
 	}
 	inst.services = append(inst.services, newService(stat.Name(), expected))
@@ -107,7 +100,7 @@ func copyFile(src, dst string) error {
 	var buf = make([]byte, 5*2^20)
 	stat, err := os.Stat(src)
 	if err != nil {
-		fmt.Println("STAT err")
+		fmt.Println("stat err")
 		return err
 	}
 	if !stat.Mode().IsRegular() {
@@ -115,7 +108,7 @@ func copyFile(src, dst string) error {
 	}
 	source, err := os.Open(src)
 	if err != nil {
-		fmt.Println("OPne err")
+		fmt.Println("open err")
 		return err
 	}
 	defer func(source *os.File) {
@@ -123,7 +116,7 @@ func copyFile(src, dst string) error {
 	}(source)
 	destination, err := os.Create(dst)
 	if err != nil {
-		fmt.Println("Create err")
+		fmt.Println("create err")
 		return err
 	}
 	defer func(destination *os.File) {

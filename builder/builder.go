@@ -86,7 +86,7 @@ type WriteFile struct {
 
 func checkPath(path string) error {
 	if strings.Contains(path, "//") {
-		return fmt.Errorf("path is formed incorrect, path cant have // in the path:%s", path)
+		return fmt.Errorf("path is formed incorrect, path cant have // in the path: %s", path)
 	}
 	return nil
 }

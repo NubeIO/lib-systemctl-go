@@ -3,7 +3,7 @@
 - Add a new file in /tmp named `/tmp/rubix-updater.service`
 - go build main.go && sudo ./main add /tmp/rubix-updater.service
 - the command above copied the file too /lib/systemd/system/rubix-updater.service
-- confirm its there -- `cat /lib/systemd/system/rubix-updater.service`
+- confirm it's there -- `cat /lib/systemd/system/rubix-updater.service`
 
 ### add the tmp service file
 

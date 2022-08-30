@@ -24,12 +24,9 @@ type RemoveRes struct {
 	DeleteServiceFileUsr bool   `json:"delete_service_file_usr"`
 }
 
-func (inst *conf) Remove() (*RemoveRes, error) {
+func (inst *conf) Remove() *RemoveRes {
 	res := &RemoveRes{}
-	ctl := systemctl.New(&systemctl.Ctl{
-		UserMode: false,
-		Timeout:  inst.InstallOpts.Options.Timeout,
-	})
+	ctl := systemctl.New(false, inst.InstallOpts.Options.Timeout)
 	wasInstalled, err := ctl.IsInstalled(inst.service, inst.RemoveOpts.RemoveOpts)
 	if err != nil {
 		log.Errorln("failed to check if service was installed:", inst.service)
@@ -71,7 +68,7 @@ func (inst *conf) Remove() (*RemoveRes, error) {
 		res.DeleteServiceFile = true
 	}
 	// remove service file from /usr/lib/system
-	if true { // TODO this is probs not needed
+	if true { // TODO this is probably not needed
 		err = inst.removeUsrLib()
 		if err != nil {
 			log.Errorln("failed to delete-file /usr/lib/systemd/system/", inst.service)
@@ -79,7 +76,7 @@ func (inst *conf) Remove() (*RemoveRes, error) {
 			res.DeleteServiceFileUsr = true
 		}
 	}
-	return res, nil
+	return res
 }
 
 // RemoveLib service from /lib/system
@@ -90,11 +87,11 @@ func (inst *conf) RemoveLib() error {
 	name = strings.TrimSuffix(name, ".service")
 	svc := inst.Has(name)
 	if svc == nil {
-		return errors.New(fmt.Sprintf("remove file no service with that name exists filename:%s", name))
+		return errors.New(fmt.Sprintf("remove file no service with that name exists filename: %s", name))
 	}
 	err := os.Remove(svc.File)
 	if err != nil {
-		return errors.New(fmt.Sprintf("remove file error err: %t filename:%s", err, name))
+		return errors.New(fmt.Sprintf("remove file error err: %t filename: %s", err, name))
 	} else {
 		log.Infoln("removed file filename:", svc.File)
 	}
@@ -112,7 +109,6 @@ func (inst *conf) removeUsrLib() error {
 		return errors.New(fmt.Sprintf("Failed to remove %s: %s \n ", name, err.Error()))
 	} else {
 		log.Println("removed file ok", path.Join(serviceDir, newService(name, "").FullName()))
-
 	}
 	return nil
 }
