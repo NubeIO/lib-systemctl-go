@@ -26,8 +26,8 @@ type RemoveRes struct {
 
 func (inst *conf) Remove() *RemoveRes {
 	res := &RemoveRes{}
-	ctl := systemctl.New(false, inst.InstallOpts.Options.Timeout)
-	wasInstalled, err := ctl.IsInstalled(inst.service, inst.RemoveOpts.RemoveOpts)
+	ctl := systemctl.New(inst.Options.UserMode, inst.Options.Timeout)
+	wasInstalled, err := ctl.IsInstalled(inst.service)
 	if err != nil {
 		log.Errorln("failed to check if service was installed:", inst.service)
 	}
@@ -36,25 +36,25 @@ func (inst *conf) Remove() *RemoveRes {
 	} else {
 		res.ServiceWasInstalled = fmt.Sprintf("service was not alreay installed but we will try and stop and remove anyway: %s", inst.service)
 	}
-	err = ctl.Stop(inst.service, inst.RemoveOpts.RemoveOpts)
+	err = ctl.Stop(inst.service)
 	if err != nil {
 		log.Errorln("failed to stop:", inst.service)
 	} else {
 		res.Stop = true
 	}
-	err = ctl.Disable(inst.service, inst.RemoveOpts.RemoveOpts)
+	err = ctl.Disable(inst.service)
 	if err != nil {
 		log.Errorln("failed to disable:", inst.service)
 	} else {
 		res.Disable = true
 	}
-	err = ctl.DaemonReload(inst.RemoveOpts.RemoveOpts)
+	err = ctl.DaemonReload()
 	if err != nil {
 		log.Errorln("failed to reload-demon:", inst.service)
 	} else {
 		res.DaemonReload = true
 	}
-	err = ctl.RestartFailed(inst.RemoveOpts.RemoveOpts)
+	err = ctl.RestartFailed()
 	if err != nil {
 		log.Errorln("failed to restart-failed:", inst.service)
 	} else {

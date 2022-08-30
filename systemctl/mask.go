@@ -11,11 +11,11 @@ import (
 // Notably, Mask may return ErrDoesNotExist if a unit doesn't exist, but it will
 // continue masking anyway. Calling Mask on a non-existing masked unit does not
 // return an error. Similarly, see Unmask.
-func (inst *Ctl) Mask(unit string, opts Options) error {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) Mask(unit string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"mask", "--system", unit}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	_, _, _, err := execute(ctx, args)
@@ -29,11 +29,11 @@ func (inst *Ctl) Mask(unit string, opts Options) error {
 // doesn't exist, but only if it's not already masked.
 // If the unit doesn't exist, but it's masked anyway, no error will be
 // returned. Gross, I know. Take it up with Pottering.
-func (inst *Ctl) Unmask(unit string, opts Options) error {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) Unmask(unit string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"unmask", "--system", unit}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	_, _, _, err := execute(ctx, args)

@@ -35,8 +35,8 @@ func (inst *conf) Install() *InstallResp {
 	log.Infof("installing %s: \n ", inst.service)
 
 	// reload
-	ctl := systemctl.New(false, inst.InstallOpts.Options.Timeout)
-	err := ctl.DaemonReload(inst.InstallOpts.Options)
+	ctl := systemctl.New(inst.Options.UserMode, inst.Options.Timeout)
+	err := ctl.DaemonReload()
 	if err != nil {
 		log.Errorf("failed to deamon-reload %s: err: %s \n ", inst.service, err.Error())
 		resp.DaemonReload = err.Error()
@@ -44,7 +44,7 @@ func (inst *conf) Install() *InstallResp {
 	}
 
 	// enable
-	err = ctl.Enable(inst.service, inst.InstallOpts.Options)
+	err = ctl.Enable(inst.service)
 	if err != nil {
 		log.Errorf("failed to enable %s: err: %s \n ", inst.service, err.Error())
 		resp.Enable = err.Error()
@@ -53,7 +53,7 @@ func (inst *conf) Install() *InstallResp {
 	log.Infof("enable new service: %s \n ", inst.service)
 
 	// start
-	err = ctl.Restart(inst.service, inst.InstallOpts.Options)
+	err = ctl.Restart(inst.service)
 	if err != nil {
 		log.Errorf("failed to start %s: err: %s \n ", inst.service, err.Error())
 		resp.Restart = err.Error()

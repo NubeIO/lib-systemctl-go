@@ -18,11 +18,11 @@ import (
 //
 // See https://www.freedesktop.org/software/systemd/man/systemctl.html#is-enabled%20UNIT%E2%80%A6
 // for more information
-func (inst *Ctl) IsEnabled(unit string, opts Options) (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) IsEnabled(unit string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"is-enabled", "--system", unit}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	stdout, _, _, err := execute(ctx, args)
@@ -63,11 +63,11 @@ func (inst *Ctl) IsEnabled(unit string, opts Options) (bool, error) {
 //
 // Returns true if the unit is active, false if inactive or failed.
 // Also returns false in an error case.
-func (inst *Ctl) IsActive(unit string, opts Options) (active bool, status string, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) IsActive(unit string) (active bool, status string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"is-active", "--system", unit}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	stdout, _, _, _ := execute(ctx, args)
@@ -87,8 +87,8 @@ func (inst *Ctl) IsActive(unit string, opts Options) (active bool, status string
 }
 
 // IsRunning Check whether specified units is in a "running" state.
-func (inst *Ctl) IsRunning(unit string, opts Options) (active bool, status string, err error) {
-	stats, err := inst.State(unit, opts)
+func (inst *Ctl) IsRunning(unit string) (active bool, status string, err error) {
+	stats, err := inst.State(unit)
 	if err != nil {
 		return false, string(stats.SubState), err
 	}
@@ -99,11 +99,11 @@ func (inst *Ctl) IsRunning(unit string, opts Options) (active bool, status strin
 }
 
 // IsFailed Check whether any of the specified units are in a "failed" state.
-func (inst *Ctl) IsFailed(unit string, opts Options) (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) IsFailed(unit string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"is-failed", "--system", unit}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	stdout, _, _, err := execute(ctx, args)
@@ -118,11 +118,11 @@ func (inst *Ctl) IsFailed(unit string, opts Options) (bool, error) {
 }
 
 // IsInstalled checks if the program is installed
-func (inst *Ctl) IsInstalled(unit string, opts Options) (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) IsInstalled(unit string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"status", "--system", unit}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	stdout, _, _, _ := execute(ctx, args)

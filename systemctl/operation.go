@@ -71,20 +71,19 @@ func (inst *Ctl) CtlAction(action, unit string) (*SystemResponse, error) {
 	if unit == "" {
 		return nil, errors.New("service-name can not be empty")
 	}
-	opts := Options{UserMode: inst.UserMode, Timeout: inst.Timeout}
 	resp := &SystemResponse{}
 	var err error
 	switch action {
 	case "start":
-		err = inst.Start(unit, opts)
+		err = inst.Start(unit)
 	case "stop":
-		err = inst.Stop(unit, opts)
+		err = inst.Stop(unit)
 	case "enable":
-		err = inst.Enable(unit, opts)
+		err = inst.Enable(unit)
 	case "disable":
-		err = inst.Disable(unit, opts)
+		err = inst.Disable(unit)
 	case "restart":
-		err = inst.Restart(unit, opts)
+		err = inst.Restart(unit)
 	default:
 		return nil, errors.New("no valid action found try, start, stop, enable or disable")
 	}
@@ -108,18 +107,17 @@ func (inst *Ctl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
 	if unit == "" {
 		return nil, errors.New("service-name can not be empty")
 	}
-	opts := Options{UserMode: inst.UserMode, Timeout: inst.Timeout}
 	actionResp := &SystemResponseChecks{}
 	switch action {
 	case isRunning.String():
-		running, status, err := inst.IsRunning(unit, opts)
+		running, status, err := inst.IsRunning(unit)
 		if err != nil {
 			return nil, err
 		}
 		actionResp.Is = running
 		actionResp.Message = status
 	case isInstalled.String():
-		installed, err := inst.IsInstalled(unit, opts)
+		installed, err := inst.IsInstalled(unit)
 		if err != nil {
 			actionResp.Message = "is not installed"
 			return nil, err
@@ -127,7 +125,7 @@ func (inst *Ctl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
 		actionResp.Is = installed
 		actionResp.Message = "is installed"
 	case isEnabled.String():
-		enabled, err := inst.IsEnabled(unit, opts)
+		enabled, err := inst.IsEnabled(unit)
 		if err != nil {
 			actionResp.Message = "is not enabled"
 			return nil, err
@@ -135,7 +133,7 @@ func (inst *Ctl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
 		actionResp.Is = enabled
 		actionResp.Message = "is enabled"
 	case isActive.String():
-		active, sts, err := inst.IsActive(unit, opts)
+		active, sts, err := inst.IsActive(unit)
 		if err != nil {
 			actionResp.Message = sts
 			return nil, err
@@ -143,7 +141,7 @@ func (inst *Ctl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
 		actionResp.Is = active
 		actionResp.Message = sts
 	case isFailed.String():
-		failed, err := inst.IsFailed(unit, opts)
+		failed, err := inst.IsFailed(unit)
 		if err != nil {
 			actionResp.Message = "is not failed"
 			return nil, err
@@ -171,8 +169,7 @@ func (inst *Ctl) ServiceStateMass(serviceNames []string) (resp []SystemState, er
 }
 
 func (inst *Ctl) ServiceState(serviceName string) (resp SystemState, err error) {
-	opts := Options{UserMode: inst.UserMode, Timeout: inst.Timeout}
-	resp, err = inst.State(serviceName, opts)
+	resp, err = inst.State(serviceName)
 	if err != nil {
 		return resp, err
 	}

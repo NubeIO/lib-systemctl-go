@@ -30,52 +30,46 @@ var serviceCmd = &cobra.Command{
 }
 
 func run(cmd *cobra.Command, args []string) {
-	timeOut := 5
-	opts := systemctl.Options{Timeout: timeOut}
-	systemctlObject := systemctl.New(write, timeOut)
+	timeout := 5
+	systemctlObject := systemctl.New(false, timeout)
 	if isActive {
-		out, msg, err := systemctlObject.IsActive(serviceName, opts)
+		out, msg, err := systemctlObject.IsActive(serviceName)
 		fmt.Println(out, msg)
 		fmt.Println(err)
 	}
 
 	if status {
-		out, err := systemctlObject.Status(serviceName, opts)
+		out, err := systemctlObject.Status(serviceName)
 		fmt.Println(out)
 		fmt.Println(err)
 	}
 
 	if start {
-		err := systemctlObject.Start(serviceName, opts)
+		err := systemctlObject.Start(serviceName)
 		fmt.Println(err)
 	}
 
 	if restart {
-		err := systemctlObject.Restart(serviceName, opts)
+		err := systemctlObject.Restart(serviceName)
 		fmt.Println(err)
 	}
 
 	if stop {
-		err := systemctlObject.Stop(serviceName, opts)
+		err := systemctlObject.Stop(serviceName)
 		fmt.Println(err)
 	}
 
 	if enable {
-		err := systemctlObject.Enable(serviceName, opts)
+		err := systemctlObject.Enable(serviceName)
 		fmt.Println(err)
 	}
 
 	if disable {
-		err := systemctlObject.Disable(serviceName, opts)
+		err := systemctlObject.Disable(serviceName)
 		fmt.Println(err)
 	}
 
-	installOpts := ctl.InstallOpts{Options: opts}
-	service := ctl.New(serviceName)
-	removeOpts := ctl.RemoveOpts{RemoveOpts: opts}
-	service.InstallOpts = installOpts
-	service.RemoveOpts = removeOpts
-
+	service := ctl.New(serviceName, false, timeout)
 	if add {
 		err := service.Add(path)
 		if err != nil {
@@ -92,10 +86,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	if remove {
 		fmt.Println("try and remove a file:", serviceName)
-		_, err := service.Remove()
-		if err != nil {
-			fmt.Println("remove error", err)
-		}
+		service.Remove()
 	}
 }
 

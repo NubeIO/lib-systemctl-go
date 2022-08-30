@@ -6,11 +6,11 @@ import (
 )
 
 // RestartFailed to remove the failed status. To reset all units with failed status:
-func (inst *Ctl) RestartFailed(opts Options) error {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) RestartFailed() error {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"reset-failed", "--system"}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	_, _, _, err := execute(ctx, args)
@@ -23,11 +23,11 @@ func (inst *Ctl) RestartFailed(opts Options) error {
 // files, and recreate the entire dependency tree. While the daemon is being
 // reloaded, all sockets systemd listens on behalf of user configuration will
 // stay accessible.
-func (inst *Ctl) DaemonReload(opts Options) error {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) DaemonReload() error {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"daemon-reload", "--system"}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	_, _, _, err := execute(ctx, args)
@@ -36,11 +36,11 @@ func (inst *Ctl) DaemonReload(opts Options) error {
 
 // Restart Stop and then start one or more units specified on the command line.
 // If the units are not running yet, they will be started.
-func (inst *Ctl) Restart(unit string, opts Options) error {
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+func (inst *Ctl) Restart(unit string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"restart", "--system", unit}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	_, _, _, err := execute(ctx, args)

@@ -47,21 +47,21 @@ type SystemState struct {
 }
 
 // State get status
-func (inst *Ctl) State(unit string, opts Options) (SystemState, error) {
+func (inst *Ctl) State(unit string) (SystemState, error) {
 	stats := SystemState{
 		ServiceName: unit,
 	}
-	_, err := inst.IsInstalled(unit, opts)
+	_, err := inst.IsInstalled(unit)
 	if err != nil {
 		stats.IsInstalled = false
 		return stats, nil
 	} else {
 		stats.IsInstalled = true
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(opts.Timeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"show", unit, "--no-page"}
-	if opts.UserMode {
+	if inst.UserMode {
 		args[1] = "--user"
 	}
 	stdout, _, _, err := execute(ctx, args)

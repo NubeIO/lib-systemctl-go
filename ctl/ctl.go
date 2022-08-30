@@ -2,6 +2,7 @@ package ctl
 
 import (
 	"fmt"
+	"github.com/NubeIO/lib-systemctl-go/systemctl"
 	"io/ioutil"
 	"os"
 	"path"
@@ -11,17 +12,17 @@ import (
 )
 
 type conf struct {
-	service     string
-	services    []*service // list of managed services
-	systemdDir  string
-	locker      *sync.Mutex
-	InstallOpts InstallOpts
-	RemoveOpts  RemoveOpts
+	service    string
+	services   []*service // list of managed services
+	systemdDir string
+	locker     *sync.Mutex
+	Options    systemctl.Options
 }
 
-func New(service string) *conf {
+func New(service string, userMode bool, timeout int) *conf {
 	c := newConf()
 	c.service = service
+	c.Options = systemctl.Options{UserMode: userMode, Timeout: timeout}
 	return c
 }
 
