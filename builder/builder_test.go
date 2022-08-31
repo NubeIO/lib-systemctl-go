@@ -1,29 +1,35 @@
 package builder
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
 func TestSystemDBuilder(t *testing.T) {
-	description := "BIOS comes with default OS, non-upgradable"
+	description := "Rubix Edge BIOS comes with default OS, non-upgradable"
 	user := "root"
-	directory := "/data/rubix-bios-app/v1.5.2"
-	execCmd := "./data/rubix-bios -p 1615 -g /data/rubix-bios -d data -c config -a apps --prod --auth  --device-type amd64 --token 1234"
-	bld := &SystemDBuilder{
+	wd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	execCmd := fmt.Sprintf("%s/rubix-edge-bios server -p 1659 -r /data -a rubix-edge-bios -d data -c config -a apps --prod --auth", wd)
+	systemdBuilder := &SystemDBuilder{
 		ServiceName:      "rubix-bios",
 		Description:      description,
 		User:             user,
-		WorkingDirectory: directory,
+		WorkingDirectory: wd,
 		ExecStart:        execCmd,
-		SyslogIdentifier: "rubix-bios",
+		SyslogIdentifier: "rubix-edge-bios",
 		WriteFile: WriteFile{
 			Write:    false,
-			FileName: "nubeio-rubix-bios",
+			FileName: "nubeio-rubix-edge-bios",
 			Path:     "/tmp",
 		},
 	}
 
-	err := bld.Build(0700)
+	err = systemdBuilder.Build(0644)
 	assert.Nil(t, err)
 }

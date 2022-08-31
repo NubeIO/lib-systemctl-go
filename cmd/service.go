@@ -2,24 +2,24 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/NubeIO/lib-systemctl-go/ctl"
+	"github.com/NubeIO/lib-systemctl-go/systemd"
 
 	"github.com/NubeIO/lib-systemctl-go/systemctl"
 	"github.com/spf13/cobra"
 )
 
 var (
-	isActive bool
-	status   bool
-	start    bool
-	restart  bool
-	stop     bool
-	enable   bool
-	disable  bool
-	add      bool
-	remove   bool
-	install  bool
-	path     string
+	isActive            bool
+	status              bool
+	start               bool
+	restart             bool
+	stop                bool
+	enable              bool
+	disable             bool
+	transferSystemdFile bool
+	remove              bool
+	install             bool
+	path                string
 )
 
 var serviceCmd = &cobra.Command{
@@ -69,11 +69,11 @@ func run(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 	}
 
-	service := ctl.New(serviceName, false, timeout)
-	if add {
-		err := service.Add(path)
+	service := systemd.New(serviceName, false, timeout)
+	if transferSystemdFile {
+		err := service.TransferSystemdFile(path)
 		if err != nil {
-			fmt.Println("add error", err)
+			fmt.Println("transfer systemd file error", err)
 		}
 	}
 
@@ -101,7 +101,7 @@ func init() {
 	serviceCmd.Flags().BoolVarP(&disable, "disable", "", false, "disable a service")
 
 	serviceCmd.Flags().StringVarP(&path, "path", "", "", "provide the path of the new service file eg: /tmp/rubix-updater.service")
-	serviceCmd.Flags().BoolVarP(&add, "add", "", false, "add a new service file")
+	serviceCmd.Flags().BoolVarP(&transferSystemdFile, "transfer-systemd-file", "", false, "add a new service file")
 	serviceCmd.Flags().BoolVarP(&install, "install", "", false, "deamon-reload, enable, start service")
 	serviceCmd.Flags().BoolVarP(&remove, "remove", "", false, "remove a new service")
 }
