@@ -18,7 +18,7 @@ import (
 //
 // See https://www.freedesktop.org/software/systemd/man/systemctl.html#is-enabled%20UNIT%E2%80%A6
 // for more information
-func (inst *Ctl) IsEnabled(unit string) (bool, error) {
+func (inst *SystemCtl) IsEnabled(unit string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"is-enabled", "--system", unit}
@@ -63,7 +63,7 @@ func (inst *Ctl) IsEnabled(unit string) (bool, error) {
 //
 // Returns true if the unit is active, false if inactive or failed.
 // Also returns false in an error case.
-func (inst *Ctl) IsActive(unit string) (active bool, status string, err error) {
+func (inst *SystemCtl) IsActive(unit string) (active bool, status string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"is-active", "--system", unit}
@@ -87,7 +87,7 @@ func (inst *Ctl) IsActive(unit string) (active bool, status string, err error) {
 }
 
 // IsRunning Check whether specified units is in a "running" state.
-func (inst *Ctl) IsRunning(unit string) (active bool, status string, err error) {
+func (inst *SystemCtl) IsRunning(unit string) (active bool, status string, err error) {
 	stats, err := inst.State(unit)
 	if err != nil {
 		return false, string(stats.SubState), err
@@ -99,7 +99,7 @@ func (inst *Ctl) IsRunning(unit string) (active bool, status string, err error) 
 }
 
 // IsFailed Check whether any of the specified units are in a "failed" state.
-func (inst *Ctl) IsFailed(unit string) (bool, error) {
+func (inst *SystemCtl) IsFailed(unit string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"is-failed", "--system", unit}
@@ -118,7 +118,7 @@ func (inst *Ctl) IsFailed(unit string) (bool, error) {
 }
 
 // IsInstalled checks if the program is installed
-func (inst *Ctl) IsInstalled(unit string) (bool, error) {
+func (inst *SystemCtl) IsInstalled(unit string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"status", "--system", unit}

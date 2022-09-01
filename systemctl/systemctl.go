@@ -12,7 +12,7 @@ import (
 // This removes all symlinks to the unit files backing the specified units from
 // the unit configuration directory, and hence undoes any changes made by
 // enable or link.
-func (inst *Ctl) Disable(unit string) error {
+func (inst *SystemCtl) Disable(unit string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"disable", "--system", unit}
@@ -29,7 +29,7 @@ func (inst *Ctl) Disable(unit string) error {
 // the indicated unit files. After the symlinks have been created, the system
 // manager configuration is reloaded (in a way equivalent to daemon-reload),
 // in order to ensure the changes are taken into account immediately.
-func (inst *Ctl) Enable(unit string) error {
+func (inst *SystemCtl) Enable(unit string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"enable", "--system", unit}
@@ -42,7 +42,7 @@ func (inst *Ctl) Enable(unit string) error {
 
 // Show a selected property of a unit. Accepted properties are predefined in the
 // properties' subpackage to guarantee properties are valid and assist code-completion.
-func (inst *Ctl) Show(unit string, property properties.Property) (string, error) {
+func (inst *SystemCtl) Show(unit string, property properties.Property) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"show", "--system", unit, "--property", string(property)}
@@ -56,7 +56,7 @@ func (inst *Ctl) Show(unit string, property properties.Property) (string, error)
 }
 
 // Start (activate) a given unit
-func (inst *Ctl) Start(unit string) error {
+func (inst *SystemCtl) Start(unit string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"start", "--system", unit}
@@ -72,7 +72,7 @@ func (inst *Ctl) Start(unit string) error {
 //
 // Generally, it makes more sense to programmatically retrieve the properties
 // using Show, but this command is provided for the sake of completeness
-func (inst *Ctl) Status(unit string) (string, error) {
+func (inst *SystemCtl) Status(unit string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"status", "--system", unit}
@@ -87,7 +87,7 @@ func (inst *Ctl) Status(unit string) (string, error) {
 }
 
 // Stop (deactivate) a given unit
-func (inst *Ctl) Stop(unit string) error {
+func (inst *SystemCtl) Stop(unit string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), setTimeout(inst.Timeout)*time.Second)
 	defer cancel()
 	var args = []string{"stop", "--system", unit}

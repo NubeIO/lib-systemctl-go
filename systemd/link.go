@@ -5,13 +5,13 @@ import (
 	"syscall"
 )
 
-func (inst *conf) SoftLink() error {
+func (inst *Systemd) SoftLink() error {
 	actualFile := path.Join(inst.systemdDir, inst.service)
 	linkFile := path.Join(inst.systemdSoftLinkDir, inst.service)
 	return syscall.Symlink(actualFile, linkFile)
 }
 
-func (inst *conf) SoftUnlink() error {
+func (inst *Systemd) SoftUnlink() error {
 	file := path.Join(inst.systemdSoftLinkDir, inst.service)
 	return syscall.Unlink(file)
 }

@@ -10,7 +10,7 @@ import (
 	"path"
 )
 
-type RemoveRes struct {
+type UninstallResponse struct {
 	ServiceWasInstalled bool `json:"service_was_installed"`
 	Stop                bool `json:"stop"`
 	DaemonReload        bool `json:"daemon_reload"`
@@ -18,8 +18,8 @@ type RemoveRes struct {
 	DeleteServiceFile   bool `json:"delete_service_file"`
 }
 
-func (inst *conf) Remove() (res *RemoveRes) {
-	res = &RemoveRes{}
+func (inst *Systemd) Uninstall() (res *UninstallResponse) {
+	res = &UninstallResponse{}
 	ctl := systemctl.New(inst.Options.UserMode, inst.Options.Timeout)
 
 	wasInstalled, err := ctl.IsInstalled(inst.service)
@@ -59,7 +59,7 @@ func (inst *conf) Remove() (res *RemoveRes) {
 	return
 }
 
-func (inst *conf) RemoveLib() error {
+func (inst *Systemd) RemoveLib() error {
 	file := path.Join(inst.systemdDir, inst.service)
 	hasFile := fileutils.FileExists(file)
 	if hasFile == false {

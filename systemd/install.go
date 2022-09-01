@@ -14,7 +14,7 @@ type InstallOpts struct {
 	Options systemctl.Options
 }
 
-type InstallResp struct {
+type InstallResponse struct {
 	UnlinkServiceFile bool `json:"unlink_service_file"`
 	LinkServiceFile   bool `json:"link_service_file"`
 	DaemonReload      bool `json:"daemon_reload"`
@@ -23,7 +23,7 @@ type InstallResp struct {
 }
 
 // TransferSystemdFile a new service
-func (inst *conf) TransferSystemdFile(sourceFile string) error {
+func (inst *Systemd) TransferSystemdFile(sourceFile string) error {
 	inst.locker.Lock()
 	defer inst.locker.Unlock()
 	if filepath.Ext(sourceFile) != ".service" {
@@ -42,8 +42,8 @@ func (inst *conf) TransferSystemdFile(sourceFile string) error {
 }
 
 // Install a new service
-func (inst *conf) Install() (resp *InstallResp) {
-	resp = &InstallResp{}
+func (inst *Systemd) Install() (resp *InstallResponse) {
+	resp = &InstallResponse{}
 	ctl := systemctl.New(inst.Options.UserMode, inst.Options.Timeout)
 
 	log.Info(fmt.Sprintf("soft un-linking linux service: %s...", inst.service))

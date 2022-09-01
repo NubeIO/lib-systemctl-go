@@ -23,7 +23,7 @@ type MassSystemResponseChecks struct {
 }
 
 // ServiceMassAction mass start, stop, enable, disable, a service
-func (inst *Ctl) ServiceMassAction(serviceNames []string, action string) ([]MassSystemResponse, error) {
+func (inst *SystemCtl) ServiceMassAction(serviceNames []string, action string) ([]MassSystemResponse, error) {
 	if len(serviceNames) == 0 {
 		return nil, errors.New("no service names where provided")
 	}
@@ -45,7 +45,7 @@ func (inst *Ctl) ServiceMassAction(serviceNames []string, action string) ([]Mass
 }
 
 // ServiceMassStatus check if a service isRunning, isEnabled and so on
-func (inst *Ctl) ServiceMassStatus(serviceNames []string, action string) ([]MassSystemResponseChecks, error) {
+func (inst *SystemCtl) ServiceMassStatus(serviceNames []string, action string) ([]MassSystemResponseChecks, error) {
 	if len(serviceNames) == 0 {
 		return nil, errors.New("no service names where provided")
 	}
@@ -67,7 +67,7 @@ func (inst *Ctl) ServiceMassStatus(serviceNames []string, action string) ([]Mass
 }
 
 // CtlAction start, stop, enable, disable a service
-func (inst *Ctl) CtlAction(action, unit string) (*SystemResponse, error) {
+func (inst *SystemCtl) CtlAction(action, unit string) (*SystemResponse, error) {
 	if unit == "" {
 		return nil, errors.New("service-name can not be empty")
 	}
@@ -103,7 +103,7 @@ type SystemResponseChecks struct {
 }
 
 // CtlStatus check isRunning, isInstalled, isEnabled, isActive, isFailed for a service
-func (inst *Ctl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
+func (inst *SystemCtl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
 	if unit == "" {
 		return nil, errors.New("service-name can not be empty")
 	}
@@ -154,7 +154,7 @@ func (inst *Ctl) CtlStatus(action, unit string) (*SystemResponseChecks, error) {
 	return actionResp, nil
 }
 
-func (inst *Ctl) ServiceStateMass(serviceNames []string) (resp []SystemState, err error) {
+func (inst *SystemCtl) ServiceStateMass(serviceNames []string) (resp []SystemState, err error) {
 	if len(serviceNames) == 0 {
 		return nil, errors.New("no service names where provided")
 	}
@@ -168,7 +168,7 @@ func (inst *Ctl) ServiceStateMass(serviceNames []string) (resp []SystemState, er
 	return resp, nil
 }
 
-func (inst *Ctl) ServiceState(serviceName string) (resp SystemState, err error) {
+func (inst *SystemCtl) ServiceState(serviceName string) (resp SystemState, err error) {
 	resp, err = inst.State(serviceName)
 	if err != nil {
 		return resp, err

@@ -86,7 +86,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	if remove {
 		fmt.Println("try and remove a file:", serviceName)
-		service.Remove()
+		service.Uninstall()
 	}
 }
 

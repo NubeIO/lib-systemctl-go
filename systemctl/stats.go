@@ -47,7 +47,7 @@ type SystemState struct {
 }
 
 // State get status
-func (inst *Ctl) State(unit string) (SystemState, error) {
+func (inst *SystemCtl) State(unit string) (SystemState, error) {
 	stats := SystemState{
 		ServiceName: unit,
 	}
