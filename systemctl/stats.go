@@ -43,7 +43,7 @@ type SystemState struct {
 	ActiveEnterTimestamp   string        `json:"active_enter_timestamp,omitempty"`
 	InactiveEnterTimestamp string        `json:"inactive_enter_timestamp,omitempty"`
 	Restarts               string        `json:"restarts,omitempty"` // number of restart
-	IsInstalled            bool          `json:"is_installed"`
+	IsInstalled            bool          `json:"is_installed,omitempty"`
 }
 
 // State get status
