@@ -39,15 +39,15 @@ type SystemState struct {
 	ServiceName            string        `json:"service_name,omitempty"`
 	State                  UnitFileState `json:"state,omitempty"`        // enabled, disabled
 	ActiveState            ActiveState   `json:"active_state,omitempty"` // active, inactive
-	SubState               SubState      `json:"sub_state,omitempty"`    // running, //dead
+	SubState               SubState      `json:"sub_state,omitempty"`    // running, dead
 	ActiveEnterTimestamp   string        `json:"active_enter_timestamp,omitempty"`
 	InactiveEnterTimestamp string        `json:"inactive_enter_timestamp,omitempty"`
-	Restarts               string        `json:"restarts,omitempty"` // NRestarts number of restart
-	IsInstalled            bool          `json:"is_installed"`
+	Restarts               string        `json:"restarts,omitempty"` // number of restart
+	IsInstalled            bool          `json:"is_installed,omitempty"`
 }
 
 // State get status
-func (inst *Ctl) State(unit string) (SystemState, error) {
+func (inst *SystemCtl) State(unit string) (SystemState, error) {
 	stats := SystemState{
 		ServiceName: unit,
 	}

@@ -9,7 +9,7 @@ import (
 const dateFormat = "Mon 2006-01-02 15:04:05 MST"
 
 // GetStartTime Get start time of a service (`systemctl show [unit] --property ExecMainStartTimestamp`) as a `Time` type
-func (inst *Ctl) GetStartTime(unit string) (time.Time, error) {
+func (inst *SystemCtl) GetStartTime(unit string) (time.Time, error) {
 	value, err := inst.Show(unit, properties.ExecMainStartTimestamp)
 
 	if err != nil {
@@ -23,7 +23,7 @@ func (inst *Ctl) GetStartTime(unit string) (time.Time, error) {
 }
 
 // GetNumRestarts Get the number of times a process restarted (`systemctl show [unit] --property NRestarts`) as an int
-func (inst *Ctl) GetNumRestarts(unit string) (int, error) {
+func (inst *SystemCtl) GetNumRestarts(unit string) (int, error) {
 	value, err := inst.Show(unit, properties.NRestarts)
 	if err != nil {
 		return -1, err
@@ -32,7 +32,7 @@ func (inst *Ctl) GetNumRestarts(unit string) (int, error) {
 }
 
 // GetMemoryUsage Get current memory in bytes (`systemctl show [unit] --property MemoryCurrent`) an an int
-func (inst *Ctl) GetMemoryUsage(unit string) (int, error) {
+func (inst *SystemCtl) GetMemoryUsage(unit string) (int, error) {
 	value, err := inst.Show(unit, properties.MemoryCurrent)
 	if err != nil {
 		return -1, err
@@ -44,7 +44,7 @@ func (inst *Ctl) GetMemoryUsage(unit string) (int, error) {
 }
 
 // GetPID Get the PID of the main process (`systemctl show [unit] --property MainPID`) as an int
-func (inst *Ctl) GetPID(unit string) (int, error) {
+func (inst *SystemCtl) GetPID(unit string) (int, error) {
 	value, err := inst.Show(unit, properties.MainPID)
 	if err != nil {
 		return -1, err
