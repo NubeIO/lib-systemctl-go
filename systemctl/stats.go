@@ -2,9 +2,21 @@ package systemctl
 
 import (
 	"context"
+	"strconv"
 	"strings"
 	"time"
 )
+
+/*
+#include <time.h>
+static unsigned long long get_nsecs(void)
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (unsigned long long)ts.tv_sec * 1000000000UL + ts.tv_nsec;
+}
+*/
+import "C"
 
 // UnitFileState is state type for Systemctl
 type UnitFileState string
@@ -36,14 +48,17 @@ const (
 )
 
 type SystemState struct {
-	ServiceName            string        `json:"service_name,omitempty"`
-	State                  UnitFileState `json:"state,omitempty"`        // enabled, disabled
-	ActiveState            ActiveState   `json:"active_state,omitempty"` // active, inactive
-	SubState               SubState      `json:"sub_state,omitempty"`    // running, dead
-	ActiveEnterTimestamp   string        `json:"active_enter_timestamp,omitempty"`
-	InactiveEnterTimestamp string        `json:"inactive_enter_timestamp,omitempty"`
-	Restarts               string        `json:"restarts,omitempty"` // number of restart
-	IsInstalled            bool          `json:"is_installed,omitempty"`
+	ServiceName                     string        `json:"service_name,omitempty"`
+	State                           UnitFileState `json:"state,omitempty"`        // enabled, disabled
+	ActiveState                     ActiveState   `json:"active_state,omitempty"` // active, inactive
+	SubState                        SubState      `json:"sub_state,omitempty"`    // running, dead
+	ActiveEnterTimestamp            string        `json:"active_enter_timestamp,omitempty"`
+	ActiveEnterTimestampMonotonic   uint64        `json:"active_enter_timestamp_monotonic,omitempty"`
+	InactiveEnterTimestamp          string        `json:"inactive_enter_timestamp,omitempty"`
+	InactiveEnterTimestampMonotonic uint64        `json:"inactive_enter_timestamp_monotonic,omitempty"`
+	DeviceTimestampMonotonic        uint64        `json:"device_timestamp_monotonic,omitempty"`
+	Restarts                        string        `json:"restarts,omitempty"` // number of restart
+	IsInstalled                     bool          `json:"is_installed,omitempty"`
 }
 
 // State get status
@@ -84,8 +99,14 @@ func (inst *SystemCtl) State(unit string) (SystemState, error) {
 			subState = SubState(fields[1])
 		case "ActiveEnterTimestamp":
 			stats.ActiveEnterTimestamp = fields[1]
+		case "ActiveEnterTimestampMonotonic":
+			s, _ := strconv.ParseUint(fields[1], 10, 64)
+			stats.ActiveEnterTimestampMonotonic = s
 		case "InactiveEnterTimestamp":
 			stats.InactiveEnterTimestamp = fields[1]
+		case "InactiveEnterTimestampMonotonic":
+			s, _ := strconv.ParseUint(fields[1], 10, 64)
+			stats.InactiveEnterTimestampMonotonic = s
 		case "NRestarts":
 			stats.Restarts = fields[1]
 		default:
@@ -93,6 +114,8 @@ func (inst *SystemCtl) State(unit string) (SystemState, error) {
 		}
 	}
 
+	monotonic := uint64(C.get_nsecs())
+	stats.DeviceTimestampMonotonic = monotonic
 	stats.State = unitState
 	stats.ActiveState = activeState
 	stats.SubState = subState
